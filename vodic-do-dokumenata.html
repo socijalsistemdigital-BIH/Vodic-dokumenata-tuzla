@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2">
+<title>Vodič do dokumenata — CSR Tuzla</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5F4EF;
+    --paper-dim:#ECEAE2;
+    --ink:#20241F;
+    --ink-soft:#4A4F45;
+    --teal:#134C4A;
+    --teal-dark:#0C3634;
+    --amber:#C8862B;
+    --amber-dark:#A66E1F;
+    --line:#D8D4C6;
+    --done:#3E7D4C;
+    --card-radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Atkinson Hyperlegible', system-ui, sans-serif;
+    font-size:19px;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:110px;
+  }
+  header.top{
+    background:var(--teal);
+    color:#fff;
+    padding:22px 20px 26px;
+    position:relative;
+    overflow:hidden;
+  }
+  header.top::after{
+    content:"";
+    position:absolute;
+    right:-40px;top:-40px;
+    width:160px;height:160px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.06);
+  }
+  header.top h1{
+    margin:0 0 4px;
+    font-size:26px;
+    font-weight:700;
+    letter-spacing:.2px;
+  }
+  header.top p{
+    margin:0;
+    font-size:16px;
+    color:#CFE3DF;
+    max-width:34ch;
+  }
+  .badge{
+    display:inline-block;
+    background:rgba(255,255,255,0.14);
+    border:1px solid rgba(255,255,255,0.35);
+    color:#fff;
+    font-size:13px;
+    padding:3px 10px;
+    border-radius:20px;
+    margin-bottom:10px;
+    letter-spacing:.3px;
+  }
+
+  main{max-width:640px;margin:0 auto;padding:18px 16px 0;}
+
+  .step-label{
+    font-size:14px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--ink-soft);
+    font-weight:700;
+    margin:22px 2px 10px;
+  }
+
+  .doc-item{
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--card-radius);
+    padding:16px 16px;
+    margin-bottom:10px;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .doc-item:active{transform:scale(0.997);}
+  .doc-item.checked{
+    background:#EEF6EE;
+    border-color:var(--done);
+  }
+  .doc-item.disabled{
+    opacity:.55;
+    cursor:default;
+  }
+  .num-circle{
+    flex:0 0 auto;
+    width:34px;height:34px;
+    border-radius:50%;
+    border:2.5px solid var(--teal);
+    color:var(--teal);
+    font-weight:700;
+    font-size:15px;
+    display:flex;align-items:center;justify-content:center;
+    margin-top:2px;
+  }
+  .doc-item.checked .num-circle{
+    background:var(--done);
+    border-color:var(--done);
+    color:#fff;
+  }
+  .doc-body{flex:1;min-width:0;}
+  .doc-title{
+    font-weight:700;
+    font-size:18px;
+    margin-bottom:4px;
+  }
+  .doc-inst{
+    font-size:15px;
+    color:var(--teal-dark);
+    font-weight:700;
+  }
+  .doc-note{
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:3px;
+  }
+  .check-mark{
+    flex:0 0 auto;
+    width:30px;height:30px;
+    border-radius:8px;
+    border:2px solid var(--line);
+    margin-top:3px;
+  }
+  .doc-item.checked .check-mark{
+    background:var(--done);
+    border-color:var(--done);
+    position:relative;
+  }
+  .doc-item.checked .check-mark::after{
+    content:"";
+    position:absolute;
+    left:9px;top:4px;
+    width:7px;height:14px;
+    border:solid white;
+    border-width:0 3px 3px 0;
+    transform:rotate(40deg);
+  }
+
+  .footer-bar{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    background:var(--paper);
+    border-top:1px solid var(--line);
+    padding:12px 16px calc(14px + env(safe-area-inset-bottom));
+    box-shadow:0 -6px 18px rgba(0,0,0,0.06);
+  }
+  .footer-inner{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center;}
+  .count-pill{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:8px 14px;
+    font-size:15px;
+    font-weight:700;
+    color:var(--teal-dark);
+    white-space:nowrap;
+  }
+  .btn-primary{
+    flex:1;
+    background:var(--amber);
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    padding:16px 14px;
+    font-size:19px;
+    font-weight:700;
+    font-family:inherit;
+    cursor:pointer;
+  }
+  .btn-primary:disabled{
+    background:#C9C4B4;
+    cursor:not-allowed;
+  }
+  .btn-primary:active:not(:disabled){background:var(--amber-dark);}
+
+  /* ROUTE VIEW */
+  #routeView{display:none;}
+  .route-head{
+    padding:8px 2px 4px;
+  }
+  .route-head h2{margin:14px 0 2px;font-size:23px;}
+  .route-head p{color:var(--ink-soft);font-size:15px;margin:0 0 16px;}
+
+  .loc-row{
+    display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;
+  }
+  .loc-btn{
+    background:#fff;
+    border:1.5px solid var(--teal);
+    color:var(--teal-dark);
+    font-family:inherit;
+    font-weight:700;
+    font-size:14px;
+    padding:9px 13px;
+    border-radius:10px;
+    cursor:pointer;
+  }
+  .loc-btn.active{background:var(--teal);color:#fff;}
+
+  .mode-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+  .mode-btn{
+    flex:1;
+    min-width:90px;
+    background:#fff;
+    border:1.5px solid var(--line);
+    color:var(--ink);
+    font-family:inherit;
+    font-weight:700;
+    font-size:15px;
+    padding:11px 8px;
+    border-radius:10px;
+    cursor:pointer;
+    text-align:center;
+  }
+  .mode-btn.active{background:var(--amber);border-color:var(--amber);color:#fff;}
+
+  .voice-row{
+    display:flex;align-items:center;justify-content:space-between;
+    background:#fff;border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;margin-bottom:18px;
+  }
+  .voice-label{font-weight:700;font-size:16px;}
+  .voice-sub{font-size:13.5px;color:var(--ink-soft);font-weight:400;margin-top:2px;}
+  .switch{
+    position:relative;flex:0 0 auto;width:52px;height:30px;
+    background:#D8D4C6;border-radius:20px;cursor:pointer;transition:background .15s;
+  }
+  .switch.on{background:var(--done);}
+  .switch::after{
+    content:"";position:absolute;top:3px;left:3px;
+    width:24px;height:24px;border-radius:50%;background:#fff;
+    transition:left .15s;box-shadow:0 1px 3px rgba(0,0,0,0.3);
+  }
+  .switch.on::after{left:25px;}
+
+  .speak-btn{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--paper-dim);
+    border:1px solid var(--line);
+    color:var(--ink);
+    font-family:inherit;font-weight:700;font-size:14.5px;
+    padding:9px 14px;border-radius:9px;cursor:pointer;
+    margin-bottom:10px;
+  }
+  .speak-btn:active{background:var(--line);}
+
+  .stop-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-left:6px solid var(--amber);
+    border-radius:var(--card-radius);
+    padding:18px 18px 16px;
+    margin-bottom:16px;
+    position:relative;
+  }
+  .stop-card.final{border-left-color:var(--done);}
+  .stop-num{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:14px;
+    font-weight:700;
+    color:var(--amber-dark);
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    margin-bottom:6px;
+  }
+  .stop-card.final .stop-num{color:var(--done);}
+  .stop-name{font-size:21px;font-weight:700;margin-bottom:2px;}
+  .stop-addr{color:var(--ink-soft);font-size:15px;margin-bottom:10px;}
+  .stop-dist{
+    display:inline-block;
+    background:var(--paper-dim);
+    border-radius:8px;
+    padding:3px 10px;
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin-bottom:12px;
+  }
+  .stop-docs{
+    list-style:none;margin:0 0 14px;padding:0;
+  }
+  .stop-docs li{
+    padding:8px 0 8px 26px;
+    border-top:1px solid var(--paper-dim);
+    font-size:16px;
+    position:relative;
+  }
+  .stop-docs li::before{
+    content:"•";
+    position:absolute;left:6px;color:var(--amber);font-weight:900;
+  }
+  .nav-btn{
+    display:block;
+    text-align:center;
+    text-decoration:none;
+    background:var(--teal);
+    color:#fff;
+    font-weight:700;
+    font-size:17px;
+    padding:14px;
+    border-radius:10px;
+  }
+  .nav-btn:active{background:var(--teal-dark);}
+  .prep-note{
+    background:#FBF3E4;
+    border:1px solid #EAD8AE;
+    border-radius:10px;
+    padding:10px 12px;
+    font-size:14.5px;
+    color:#6B4E17;
+    margin-top:12px;
+  }
+
+  .skip-block{
+    background:#fff;
+    border:1px dashed var(--line);
+    border-radius:var(--card-radius);
+    padding:14px 16px;
+    margin-bottom:14px;
+    font-size:15px;
+    color:var(--ink-soft);
+  }
+  .skip-block b{color:var(--ink);}
+
+  .back-link{
+    display:inline-block;
+    margin:18px 0 6px;
+    color:var(--teal-dark);
+    font-weight:700;
+    font-size:15px;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <span class="badge">JU Centar za socijalni rad Tuzla</span>
+  <h1>Vodič do dokumenata</h1>
+  <p>Označi šta ti treba — napravićemo ti najkraći put kroz grad.</p>
+</header>
+
+<main>
+
+  <div id="checklistView">
+    <div class="step-label">Zahtjev za stalnu / jednokratnu novčanu pomoć</div>
+    <div id="docList"></div>
+  </div>
+
+  <div id="routeView">
+    <div class="back-link" onclick="showChecklist()">&larr; Nazad na listu dokumenata</div>
+    <div class="route-head">
+      <h2>Tvoja ruta</h2>
+      <p>Idi redom, od najbliže do najdalje stanice.</p>
+    </div>
+
+    <div class="loc-row" id="locRow"></div>
+
+    <div class="mode-row" id="modeRow"></div>
+
+    <div class="voice-row">
+      <div>
+        <div class="voice-label">🔊 Glasovno navođenje</div>
+        <div class="voice-sub">Aplikacija priča upute naglas, ne moraš gledati u telefon</div>
+      </div>
+      <div class="switch" id="voiceSwitch" onclick="toggleVoice()"></div>
+    </div>
+
+    <div id="stopsContainer"></div>
+    <div id="skipContainer"></div>
+  </div>
+
+</main>
+
+<div class="footer-bar" id="footerBar">
+  <div class="footer-inner">
+    <div class="count-pill" id="countPill">0 odabrano</div>
+    <button class="btn-primary" id="makeRouteBtn" disabled onclick="buildRoute()">Napravi rutu</button>
+  </div>
+</div>
+
+<script>
+// ---------- DATA ----------
+// Real coordinates gathered for Tuzla institutions
+const INSTITUTIONS = {
+  mup:      { name:"MUP Tuzlanski kanton",          addr:"Turalibegova bb, Tuzla", lat:44.5351077, lng:18.6820874 },
+  maticni:  { name:"Matični ured (zgrada Grada Tuzla)", addr:"ZAVNOBiH-a 11, Tuzla", lat:44.5327324, lng:18.687633 },
+  grad:     { name:"Grad Tuzla — Služba za geodetske i imovinsko-pravne poslove", addr:"ZAVNOBiH-a 11, Tuzla", lat:44.5327324, lng:18.687633 },
+  porezna:  { name:"Porezna uprava",                 addr:"Rudarska 72, Tuzla",     lat:44.5362804, lng:18.6527182 },
+  piomio:   { name:"Federalni zavod PIO/MIO",         addr:"Franjevačka 36, Tuzla",  lat:44.5381483, lng:18.6700677 },
+  biro:     { name:"Služba za zapošljavanje TK (Biro rada)", addr:"Bosne Srebrene 31, Tuzla", lat:44.5363857, lng:18.6623061 },
+  notar:    { name:"Notar",                           addr:"Maršala Tita 151, Tuzla", lat:44.5347215, lng:18.6867898 },
+  dom:      { name:"Dom zdravlja (Mustafa Šehović)",  addr:"Albina i Franje Herljevića 1, Tuzla", lat:44.5406835, lng:18.6671582 },
+  csr:      { name:"JU Centar za socijalni rad Tuzla — predaja papira", addr:"Kozaračka, Tuzla", lat:44.5349806, lng:18.7044554 }
+};
+
+// Sample starting points (for people coming from outlying areas, as Adnan described)
+const START_POINTS = [
+  { key:"gps", label:"📍 Moja trenutna lokacija" },
+  { key:"csr", label:"CSR Tuzla (početak)", lat:44.5349806, lng:18.7044554 },
+  { key:"mramor", label:"Mramor", lat:44.552, lng:18.715 },
+  { key:"slavinovici", label:"Slavinovići", lat:44.545, lng:18.700 },
+  { key:"centar", label:"Centar Tuzla", lat:44.5382, lng:18.6742 }
+];
+
+// Documents mirroring the actual zahtjev, in original order
+const DOCS = [
+  { id:1, title:"Lična karta podnosioca", inst:"mup", note:"Nosi original, samo na uvid.", routed:true },
+  { id:2, title:"Dokaz o prebivalištu/boravištu (PBA-4)", inst:"mup", routed:true },
+  { id:3, title:"Prijava prebivališta/boravišta (PBA-1/PBA-3)", inst:"mup", routed:true },
+  { id:4, title:"Uvjerenje o državljanstvu", inst:"maticni", routed:true },
+  { id:5, title:"Izvod iz matične knjige rođenih", inst:"maticni", routed:true },
+  { id:6, title:"Kućna lista (izjava o zajedničkom domaćinstvu)", inst:"maticni", routed:true },
+  { id:"7a", title:"Uvjerenje da si na evidenciji (Biro rada)", inst:"biro", note:"Ako si nezaposlen/a.", routed:true },
+  { id:"7b", title:"Uvjerenje o primanjima / ček od penzije (PIO/MIO)", inst:"piomio", note:"Ako primaš penziju.", routed:true },
+  { id:8, title:"Ovjerena izjava da nemaš primanja iz inostranstva", inst:"notar", note:"Ovjerava se kod notara.", routed:true },
+  { id:9, title:"Potvrda o školovanju", inst:null, note:"Vadi se u školi/fakultetu djeteta — nije fiksna adresa.", routed:false },
+  { id:11, title:"Uvjerenje — geodetska i imovinsko-pravna služba", inst:"grad", routed:true },
+  { id:12, title:"Uvjerenje iz Porezne uprave", inst:"porezna", routed:true },
+  { id:13, title:"Medicinska dokumentacija", inst:"dom", note:"Nalaz ne stariji od 6 mjeseci.", routed:true },
+  { id:14, title:"Obavijest o tekućem računu", inst:null, note:"Vadi se u tvojoj banci.", routed:false },
+  { id:10, title:"Rješenje o invalidnosti / stalnoj pomoći / dječijem dodatku", inst:null, note:"Ako ga već imaš, samo ponesi kopiju — ne treba nikuda ići.", routed:false, already:true },
+  { id:15, title:"Presuda o razvodu / izdržavanju", inst:null, note:"Ako je imaš, samo ponesi kopiju — ne treba nikuda ići.", routed:false, already:true },
+  { id:16, title:"Uvjerenje — Služba za boračko-invalidsku zaštitu", inst:null, note:"Ovo za tebe pribavlja Centar po službenoj dužnosti — ne moraš nigdje ići.", routed:false, already:true }
+];
+
+// ---------- STATE ----------
+let selected = new Set();
+let chosenStart = null;
+let travelMode = 'walking'; // walking | driving | transit
+let voiceOn = false;
+
+const TRAVEL_MODES = [
+  { key:'walking', label:'🚶 Pješke' },
+  { key:'driving', label:'🚗 Autom' },
+  { key:'transit', label:'🚌 Autobusom' }
+];
+
+function renderModeOptions(){
+  const row = document.getElementById('modeRow');
+  row.innerHTML = '';
+  TRAVEL_MODES.forEach(m=>{
+    const b = document.createElement('button');
+    b.className = 'mode-btn' + (travelMode===m.key ? ' active' : '');
+    b.textContent = m.label;
+    b.onclick = ()=>{ travelMode = m.key; renderModeOptions(); computeAndRenderRoute(); };
+    row.appendChild(b);
+  });
+}
+
+function toggleVoice(){
+  voiceOn = !voiceOn;
+  document.getElementById('voiceSwitch').classList.toggle('on', voiceOn);
+  if(voiceOn) computeAndRenderRoute();
+  else window.speechSynthesis && window.speechSynthesis.cancel();
+}
+
+function speakText(text){
+  if(!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  const voices = window.speechSynthesis.getVoices();
+  const bsVoice = voices.find(v=>/^bs/i.test(v.lang)) || voices.find(v=>/^hr/i.test(v.lang)) || voices.find(v=>/^sr/i.test(v.lang));
+  if(bsVoice) u.voice = bsVoice;
+  u.lang = bsVoice ? bsVoice.lang : 'hr-HR';
+  u.rate = 0.95;
+  window.speechSynthesis.speak(u);
+}
+
+function stopSpeechText(s, index, total, distTxt){
+  return `Stanica ${index} od ${total}. ${s.name}. Adresa: ${s.addr}. ${distTxt}. Ovdje uzimaš: ${s.docs ? s.docs.join(', ') : 'predaješ papire'}. Kad uđeš, uzmi broj ako postoji aparat. Ako ne znaš gdje je šalter, javi se zaštitaru na ulazu i reci koji papir tražiš.`;
+}
+
+// ---------- RENDER CHECKLIST ----------
+const docListEl = document.getElementById('docList');
+DOCS.forEach(d=>{
+  const el = document.createElement('div');
+  el.className = 'doc-item';
+  el.id = 'doc-'+d.id;
+  const instName = d.inst ? INSTITUTIONS[d.inst].name : null;
+  el.innerHTML = `
+    <div class="num-circle">${d.id}</div>
+    <div class="doc-body">
+      <div class="doc-title">${d.title}</div>
+      ${instName ? `<div class="doc-inst">${instName}</div>` : ''}
+      ${d.note ? `<div class="doc-note">${d.note}</div>` : ''}
+    </div>
+    <div class="check-mark"></div>
+  `;
+  el.addEventListener('click', ()=>toggleDoc(d.id, el));
+  docListEl.appendChild(el);
+});
+
+function toggleDoc(id, el){
+  if(selected.has(id)){
+    selected.delete(id);
+    el.classList.remove('checked');
+  } else {
+    selected.add(id);
+    el.classList.add('checked');
+  }
+  updateFooter();
+}
+
+function updateFooter(){
+  const n = selected.size;
+  document.getElementById('countPill').textContent = n + (n===1 ? ' odabran dokument' : ' odabrano dokumenata');
+  document.getElementById('makeRouteBtn').disabled = n===0;
+}
+
+// ---------- ROUTE BUILDING ----------
+function haversine(lat1, lng1, lat2, lng2){
+  const R = 6371;
+  const dLat = (lat2-lat1)*Math.PI/180;
+  const dLng = (lng2-lng1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function buildRoute(){
+  document.getElementById('checklistView').style.display = 'none';
+  document.getElementById('footerBar').style.display = 'none';
+  document.getElementById('routeView').style.display = 'block';
+  renderStartOptions();
+  renderModeOptions();
+  if(!chosenStart) chosenStart = START_POINTS[1]; // default: CSR Tuzla
+  computeAndRenderRoute();
+}
+
+function showChecklist(){
+  document.getElementById('checklistView').style.display = 'block';
+  document.getElementById('footerBar').style.display = 'block';
+  document.getElementById('routeView').style.display = 'none';
+}
+
+function renderStartOptions(){
+  const row = document.getElementById('locRow');
+  row.innerHTML = '';
+  START_POINTS.forEach(p=>{
+    const b = document.createElement('button');
+    b.className = 'loc-btn' + (chosenStart && chosenStart.key===p.key ? ' active' : '');
+    b.textContent = p.label;
+    b.onclick = ()=>{
+      if(p.key==='gps'){
+        if(navigator.geolocation){
+          navigator.geolocation.getCurrentPosition(pos=>{
+            chosenStart = { key:'gps', label:'📍 Moja lokacija', lat:pos.coords.latitude, lng:pos.coords.longitude };
+            renderStartOptions();
+            computeAndRenderRoute();
+          }, ()=>{
+            alert('Nije moguće dobiti lokaciju. Izaberi obližnje mjesto sa liste.');
+          });
+        }
+        return;
+      }
+      chosenStart = p;
+      renderStartOptions();
+      computeAndRenderRoute();
+    };
+    row.appendChild(b);
+  });
+}
+
+function computeAndRenderRoute(){
+  const stopsEl = document.getElementById('stopsContainer');
+  const skipEl = document.getElementById('skipContainer');
+  stopsEl.innerHTML = '';
+  skipEl.innerHTML = '';
+
+  // group selected routed docs by institution
+  const byInst = {};
+  const unroutedDocs = [];
+  DOCS.filter(d=>selected.has(d.id)).forEach(d=>{
+    if(d.routed && d.inst){
+      byInst[d.inst] = byInst[d.inst] || [];
+      byInst[d.inst].push(d.title);
+    } else {
+      unroutedDocs.push(d);
+    }
+  });
+
+  let stops = Object.keys(byInst).map(key=>({
+    key, ...INSTITUTIONS[key], docs: byInst[key]
+  }));
+
+  // greedy nearest-neighbor from chosenStart
+  let current = { lat: chosenStart.lat, lng: chosenStart.lng };
+  const ordered = [];
+  while(stops.length){
+    let bestIdx = 0, bestDist = Infinity;
+    stops.forEach((s,i)=>{
+      const dist = haversine(current.lat, current.lng, s.lat, s.lng);
+      if(dist < bestDist){ bestDist = dist; bestIdx = i; }
+    });
+    const next = stops.splice(bestIdx,1)[0];
+    next.distFromPrev = bestDist;
+    ordered.push(next);
+    current = next;
+  }
+
+  if(ordered.length === 0){
+    stopsEl.innerHTML = `<div class="skip-block">Nijedan od odabranih dokumenata ne zahtijeva odlazak — pogledaj napomene ispod.</div>`;
+  }
+
+  const totalStops = ordered.length + 1;
+  let firstStopSpeechText = null;
+
+  ordered.forEach((s,i)=>{
+    const card = document.createElement('div');
+    card.className = 'stop-card';
+    const distTxt = s.distFromPrev < 1 ? Math.round(s.distFromPrev*1000)+" m od prethodne stanice" : s.distFromPrev.toFixed(1)+" km od prethodne stanice";
+    const shownDist = i===0 ? 'Prva stanica' : distTxt;
+    const speech = stopSpeechText(s, i+1, totalStops, shownDist);
+    if(i===0) firstStopSpeechText = speech;
+    card.innerHTML = `
+      <div class="stop-num">Stanica ${i+1} od ${totalStops}</div>
+      <div class="stop-name">${s.name}</div>
+      <div class="stop-addr">${s.addr}</div>
+      <div class="stop-dist">${shownDist}</div>
+      <ul class="stop-docs">${s.docs.map(t=>`<li>${t}</li>`).join('')}</ul>
+      <button class="speak-btn" onclick='speakText(${JSON.stringify(speech)})'>🔊 Ponovi glasovno</button>
+      <a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}&travelmode=${travelMode}" target="_blank" rel="noopener">Otvori navigaciju do ovdje</a>
+      <div class="prep-note">Kad uđeš: uzmi broj na aparatu ako postoji. Ako ne znaš gdje je šalter, javi se zaštitaru na ulazu i reci koji papir tražiš.</div>
+    `;
+    stopsEl.appendChild(card);
+  });
+
+  // Final stop: always CSR Tuzla to hand in papers
+  const finalCard = document.createElement('div');
+  finalCard.className = 'stop-card final';
+  const lastPoint = ordered.length ? ordered[ordered.length-1] : chosenStart;
+  const distToCsr = haversine(lastPoint.lat, lastPoint.lng, INSTITUTIONS.csr.lat, INSTITUTIONS.csr.lng);
+  const distTxt2 = distToCsr < 1 ? Math.round(distToCsr*1000)+" m od prethodne stanice" : distToCsr.toFixed(1)+" km od prethodne stanice";
+  const finalStopObj = { name:INSTITUTIONS.csr.name, addr:INSTITUTIONS.csr.addr, docs:["Predaješ sve skupljene papire ovdje"] };
+  const finalSpeech = stopSpeechText(finalStopObj, totalStops, totalStops, distTxt2);
+  if(totalStops===1) firstStopSpeechText = finalSpeech;
+  finalCard.innerHTML = `
+    <div class="stop-num">Zadnja stanica</div>
+    <div class="stop-name">${INSTITUTIONS.csr.name}</div>
+    <div class="stop-addr">${INSTITUTIONS.csr.addr}</div>
+    <div class="stop-dist">${distTxt2}</div>
+    <ul class="stop-docs"><li>Predaj sve skupljene papire ovdje</li></ul>
+    <button class="speak-btn" onclick='speakText(${JSON.stringify(finalSpeech)})'>🔊 Ponovi glasovno</button>
+    <a class="nav-btn" href="https://www.google.com/maps/dir/?api=1&destination=${INSTITUTIONS.csr.lat},${INSTITUTIONS.csr.lng}&travelmode=${travelMode}" target="_blank" rel="noopener">Otvori navigaciju do ovdje</a>
+  `;
+  stopsEl.appendChild(finalCard);
+
+  if(voiceOn && firstStopSpeechText){
+    speakText("Ruta je spremna. " + firstStopSpeechText);
+  }
+
+  // Notes for unrouted / already-owned docs
+  if(unroutedDocs.length){
+    const block = document.createElement('div');
+    block.className = 'skip-block';
+    block.innerHTML = `<b>Ovo ne zahtijeva posebnu adresu na ruti:</b><br><br>` +
+      unroutedDocs.map(d=>`• <b>${d.title}</b> — ${d.note || ''}`).join('<br>');
+    skipEl.appendChild(block);
+  }
+}
+</script>
+
+</body>
+</html>
