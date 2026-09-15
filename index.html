@@ -2,12 +2,23 @@
 <html lang="bs">
 <head>
 <meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2">
-<title>Vodič do dokumenata — CSR Tuzla</title>
+<title>Vodič do dokumenata — Tuzla (pilot)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
+  .play-icon-btn.speaking, .speak-btn.speaking{ animation: vPulse 1s ease-in-out infinite; }
+  @keyframes vPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.15); } }
+  #accessGate{ position:fixed; inset:0; background:#FAFAF6; z-index:100000; display:flex; align-items:center; justify-content:center; padding:24px; }
+  #accessGate .box{ max-width:420px; width:100%; background:#fff; border-radius:18px; padding:28px 22px; box-shadow:0 6px 30px rgba(0,0,0,.08); text-align:center; font-family:'Atkinson Hyperlegible',system-ui,sans-serif; }
+  #accessGate h1{ font-size:24px; margin:6px 0 10px; color:#1d3557; }
+  #accessGate p{ font-size:16px; line-height:1.5; color:#333; margin:0 0 14px; }
+  #accessGate input{ width:100%; box-sizing:border-box; font-size:20px; padding:12px; border:2px solid #cfd8e3; border-radius:12px; text-align:center; letter-spacing:2px; }
+  #accessGate button{ margin-top:12px; width:100%; font-size:18px; padding:13px; border:0; border-radius:12px; background:#1d3557; color:#fff; font-weight:700; }
+  #accessGate .err{ color:#b00020; min-height:22px; font-size:15px; margin-top:8px; }
+
   :root{
     --paper:#FAFAF6;
     --paper-dim:#EFEEE5;
@@ -358,6 +369,33 @@
 </style>
 </head>
 <body>
+<div id="accessGate">
+  <div class="box">
+    <div style="font-size:40px">🔒</div>
+    <h1>Vodič do dokumenata</h1>
+    <p>Aplikacija je u fazi pilot testiranja i nije javno dostupna.</p>
+    <p>Pristupni kod dobijate na upit:<br><b>adnandrndic87@gmail.com</b></p>
+    <input id="gateCode" type="text" autocomplete="off" placeholder="Pristupni kod" onkeydown="if(event.key==='Enter')gateTry()">
+    <button type="button" onclick="gateTry()">Otvori aplikaciju</button>
+    <div class="err" id="gateErr"></div>
+  </div>
+</div>
+<script>
+(function(){
+  var H="0fdaaf854a8b25d097790ac8aa5f99a19df5bda95602658a06a6e3e92595982e";
+  try{ if(localStorage.getItem('vodic_pristup')===H){ var g=document.getElementById('accessGate'); if(g) g.remove(); } }catch(e){}
+  window.gateTry=function(){
+    var v=(document.getElementById('gateCode').value||'').trim().toUpperCase();
+    if(!window.crypto||!crypto.subtle){ document.getElementById('gateErr').textContent='Preglednik ne podržava provjeru koda.'; return; }
+    crypto.subtle.digest('SHA-256', new TextEncoder().encode(v)).then(function(buf){
+      var h=Array.prototype.map.call(new Uint8Array(buf),function(x){return ('0'+x.toString(16)).slice(-2);}).join('');
+      if(h===H){ try{localStorage.setItem('vodic_pristup',H);}catch(e){} document.getElementById('accessGate').remove(); }
+      else document.getElementById('gateErr').textContent='Pogrešan kod. Kod se dobija na upit putem e-maila.';
+    });
+  };
+})();
+</script>
+
 
 <!-- ============ LANDING ============ -->
 <div class="view active" id="view-landing">
@@ -366,7 +404,7 @@
     <p>Provjera uslova i najkraći put do potrebnih dokumenata.</p>
   </header>
   <main>
-    <div class="ad-slot" style="margin-top:16px">OGLASNI PROSTOR — rezervisano</div>
+
     <div class="landing-hero">
       <h2>Koja vrsta pomoći je potrebna?</h2>
       <div class="text-with-play"><p class="txt" style="margin:0">Izabrati vrstu pomoći — uslovi će biti objašnjeni, a potom se, po želji, sastavlja i ruta do ustanova.</p><button class="play-icon-btn" type="button" aria-label="Preslušaj tekst" onclick="speakText('Izabrati vrstu pomoći — uslovi će biti objašnjeni, a potom se, po želji, sastavlja i ruta do ustanova.', this)">🔊</button></div>
@@ -1227,8 +1265,8 @@ function buildZdravstvenoRoute(){
     selected.add(id);
   });
   window.__zdravstvenoDocsOverride = tempDocs;
-  // Za centar/predškolsko, zahtjev se predaje u CSR na kraju rute; za biro/grad, zadnja
-  // ustanova u ruti je već tačno mjesto predaje, pa se ne dodaje poseban CSR korak.
+  // Za centar/predškolsko, zahtjev se predaje u nadležnom centru na kraju rute; za biro/grad, zadnja
+  // ustanova u ruti je već tačno mjesto predaje, pa se ne dodaje poseban završni korak.
   window.__zdravstvenoSkipFinalCsr = (qz.rezultatKey === 'biro' || qz.rezultatKey === 'grad');
   goTo('view-route');
   renderStartOptions();
@@ -1248,12 +1286,12 @@ const INSTITUTIONS = {
   biro:     { name:"Služba za zapošljavanje TK (Biro rada)", addr:"Bosne Srebrene 31, Tuzla", lat:44.5363857, lng:18.6623061, icon:"💼" },
   notar:    { name:"Notar", addr:"Maršala Tita 151, Tuzla", lat:44.5347215, lng:18.6867898, icon:"🖋️" },
   dom:      { name:"Dom zdravlja (Mustafa Šehović)", addr:"Albina i Franje Herljevića 1, Tuzla", lat:44.5406835, lng:18.6671582, icon:"🏥" },
-  csr:      { name:"JU Centar za socijalni rad Tuzla — predaja papira", addr:"Kozaračka, Tuzla", lat:44.5349806, lng:18.7044554, icon:"📋" }
+  csr:      { name:"Nadležni centar za socijalni rad — predaja zahtjeva", addr:"Kozaračka, Tuzla", lat:44.5349806, lng:18.7044554, icon:"📋" }
 };
 
 const START_POINTS = [
   { key:"gps", label:"📍 Moja lokacija" },
-  { key:"csr", label:"CSR Tuzla", lat:44.5349806, lng:18.7044554 },
+  { key:"csr", label:"Kozaračka ulica", lat:44.5349806, lng:18.7044554 },
   { key:"mramor", label:"Mramor", lat:44.552, lng:18.715 },
   { key:"slavinovici", label:"Slavinovići", lat:44.545, lng:18.700 },
   { key:"centar", label:"Centar Tuzla", lat:44.5382, lng:18.6742 }
@@ -1386,61 +1424,152 @@ function toggleVoice(){
   voiceOn = !voiceOn;
   document.getElementById('voiceSwitch').classList.toggle('on', voiceOn);
   if(voiceOn) computeAndRenderRoute();
-  else window.speechSynthesis && window.speechSynthesis.cancel();
+  else stopSpeech();
 }
-// Glasovi se na mnogim telefonima učitavaju asinhrono (kasne dolaze), pa getVoices()
-// odmah po učitavanju stranice često vrati praznu listu. Ovo unaprijed "zagrijava" listu
-// i ponovo je učitava čim uređaj javi da su glasovi spremni.
-let __cachedVoices = [];
-function __refreshVoices(){
-  if('speechSynthesis' in window){ __cachedVoices = window.speechSynthesis.getVoices(); }
+// ===== GLAS (bs-BA neuralni, unaprijed snimljen) — zajednicka logika =====
+var VOICE_NUM_0_19 = ["nula","jedan","dva","tri","četiri","pet","šest","sedam","osam","devet","deset","jedanaest","dvanaest","trinaest","četrnaest","petnaest","šesnaest","sedamnaest","osamnaest","devetnaest"];
+var VOICE_TENS = {2:"dvadeset",3:"trideset",4:"četrdeset",5:"pedeset",6:"šezdeset",7:"sedamdeset",8:"osamdeset",9:"devedeset"};
+var VOICE_HUND = {1:"sto",2:"dvjesto",3:"tristo",4:"četiristo",5:"petsto",6:"šeststo",7:"sedamsto",8:"osamsto",9:"devetsto"};
+function voiceUnder100(n){ if(n<20) return [VOICE_NUM_0_19[n]]; var t=Math.floor(n/10), o=n%10; return o ? [VOICE_TENS[t], VOICE_NUM_0_19[o]] : [VOICE_TENS[t]]; }
+function voiceUnder1000(n){ var h=Math.floor(n/100), r=n%100, out=[]; if(h) out.push(VOICE_HUND[h]); if(r||!h) out=out.concat(voiceUnder100(r)); return out; }
+function voiceForm(n, one, few, many){ var l2=n%100, l1=n%10; if(l2>=11&&l2<=14) return many; if(l1===1) return one; if(l1>=2&&l1<=4) return few; return many; }
+function voiceNumberWords(n){
+  if(n===0) return ["nula"];
+  var out=[], th=Math.floor(n/1000), r=n%1000;
+  if(th){
+    if(th===1) out.push("hiljadu");
+    else {
+      var tw = voiceUnder1000(th);
+      var last = tw[tw.length-1];
+      if(last==="jedan") tw[tw.length-1]="jedna"; else if(last==="dva") tw[tw.length-1]="dvije";
+      out = out.concat(tw); out.push(voiceForm(th,"hiljada","hiljade","hiljada"));
+    }
+  }
+  if(r) out = out.concat(voiceUnder1000(r));
+  return out;
 }
-if('speechSynthesis' in window){
-  __refreshVoices();
-  window.speechSynthesis.onvoiceschanged = __refreshVoices;
+var VOICE_UNITS = { "KM":["marka","marke","maraka"], "km":["kilometar","kilometra","kilometara"], "m":["metar","metra","metara"] };
+function voiceClean(t){
+  t = String(t);
+  t = t.replace(/<[^>]+>/g," ");
+  t = t.replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">");
+  t = t.replace(/\(ne\)/g,"ne");
+  t = t.replace(/([A-Za-zčćžšđČĆŽŠĐ]+)\/(a|na|la|ica)\b/g,"$1");
+  t = t.replace(/[•→←✓✔️]/g," ");
+  t = t.replace(/[\uD83C-\uDBFF][\uDC00-\uDFFF]/g," ");
+  t = t.replace(/\s[—–-]\s/g,", ");
+  t = t.replace(/\s+/g," ").trim();
+  return t;
+}
+function voiceKey(s){ return s.toLowerCase().replace(/[^0-9a-zčćžšđ]+/g," ").trim(); }
+function voiceSentences(t){ return t.replace(/([.!?:;])\s+/g,"$1\n").split("\n").map(function(s){return s.trim();}).filter(Boolean); }
+var VOICE_NUM_RE = /\d{1,3}(?:\.\d{3})+|\d+(?:,\d+)?/g;
+function voiceTokens(sentence){
+  var out=[], last=0, m; VOICE_NUM_RE.lastIndex=0;
+  while((m=VOICE_NUM_RE.exec(sentence))){
+    if(m.index>last) out.push({t:"text", s:sentence.slice(last,m.index)});
+    var raw=m[0], intPart, dec=null;
+    if(/^\d{1,3}(\.\d{3})+$/.test(raw)) intPart=parseInt(raw.replace(/\./g,""),10);
+    else { var p=raw.split(","); intPart=parseInt(p[0],10); if(p[1]) dec=p[1]; }
+    out.push({t:"num", v:intPart, dec:dec, unit:null});
+    last = m.index+raw.length;
+  }
+  if(last<sentence.length) out.push({t:"text", s:sentence.slice(last)});
+  for(var i=0;i<out.length;i++){
+    if(out[i].t==="num" && out[i+1] && out[i+1].t==="text"){
+      var mm = out[i+1].s.match(/^\s*(KM|km|m)(?![A-Za-zčćžšđ])/);
+      if(mm){ out[i].unit=mm[1]; out[i+1].s = out[i+1].s.slice(mm[0].length); }
+    }
+  }
+  return out;
+}
+function voiceNumPhrase(tok){
+  var words = voiceNumberWords(tok.v);
+  if(tok.dec){ words = words.concat(["zarez"]).concat(voiceNumberWords(parseInt(tok.dec,10))); }
+  if(tok.unit){ var u=VOICE_UNITS[tok.unit]; if(tok.unit==="KM" && !tok.dec){ var lw=words[words.length-1]; if(lw==="jedan") words[words.length-1]="jedna"; else if(lw==="dva") words[words.length-1]="dvije"; } words.push(tok.dec ? u[1] : voiceForm(tok.v,u[0],u[1],u[2])); }
+  return words;
+}
+function voiceGenText(sentence){
+  return voiceTokens(sentence).map(function(tk){ return tk.t==="text" ? tk.s : " "+voiceNumPhrase(tk).join(" ")+" "; }).join("").replace(/\s+/g," ").replace(/\s+([,.:;!?])/g,"$1").trim();
+}
+function voicePlan(text, map){
+  var plan=[], misses=[];
+  voiceSentences(voiceClean(text)).forEach(function(sen){
+    var k = voiceKey(sen);
+    if(!k) return;
+    if(map[k]){ plan.push({k:k, gap:0.30}); return; }
+    voiceTokens(sen).forEach(function(tk){
+      if(tk.t==="num"){ voiceNumPhrase(tk).forEach(function(w){ var wk="#w "+w; if(map[wk]) plan.push({k:wk,gap:0.02}); else misses.push(wk); }); return; }
+      var k2 = voiceKey(tk.s); if(!k2) return;
+      if(map[k2]){ plan.push({k:k2,gap:0.08}); return; }
+      tk.s.split(/[,:]/).forEach(function(part){ var k3=voiceKey(part); if(!k3) return; if(map[k3]) plan.push({k:k3,gap:0.12}); else misses.push(k3); });
+    });
+    if(plan.length) plan[plan.length-1].gap = 0.30;
+  });
+  return {plan:plan, misses:misses};
 }
 
-function speakText(text, btnEl){
-  if(btnEl){
-    // Odmah vizuelna potvrda da je klik registrovan, bez obzira da li će zvuk proraditi
-    const orig = btnEl.textContent;
-    btnEl.textContent = '⏳';
-    btnEl.disabled = true;
-    setTimeout(()=>{ btnEl.textContent = orig; btnEl.disabled = false; }, 900);
+var VOICE_MAP = {"#w deset":[0.05,0.801],"#w devedeset":[0.901,1.046],"#w devet":[1.998,0.767],"#w devetnaest":[2.815,1.134],"#w devetsto":[3.999,0.9],"#w dva":[4.949,0.605],"#w dvadeset":[5.603,0.992],"#w dvanaest":[6.645,1.004],"#w dvije":[7.699,0.765],"#w dvjesto":[8.514,0.872],"#w hiljada":[9.436,0.768],"#w hiljade":[10.254,0.812],"#w hiljadu":[11.117,0.763],"#w jedan":[11.93,0.675],"#w jedanaest":[12.654,1.121],"#w jedna":[13.825,0.675],"#w kilometar":[14.551,0.94],"#w kilometara":[15.54,1.018],"#w kilometra":[16.608,0.895],"#w maraka":[17.553,0.841],"#w marka":[18.444,0.747],"#w marke":[19.241,0.765],"#w metar":[20.056,0.722],"#w metara":[20.828,0.755],"#w metra":[21.633,0.651],"#w nula":[22.334,0.689],"#w osam":[23.073,0.635],"#w osamdeset":[23.758,1.039],"#w osamnaest":[24.847,1.065],"#w osamsto":[25.962,0.896],"#w pedeset":[26.908,0.857],"#w pet":[27.816,0.632],"#w petnaest":[28.498,0.946],"#w petsto":[29.494,0.741],"#w sedam":[30.285,0.722],"#w sedamdeset":[31.057,1.05],"#w sedamnaest":[32.157,1.104],"#w sedamsto":[33.311,0.964],"#w sto":[34.324,0.661],"#w tri":[35.035,0.491],"#w trideset":[35.576,0.928],"#w trinaest":[36.554,0.937],"#w tristo":[37.541,0.777],"#w zarez":[38.368,0.834],"#w četiri":[39.251,0.741],"#w četiristo":[40.043,0.975],"#w četrdeset":[41.068,1.07],"#w četrnaest":[42.188,1.101],"#w šesnaest":[43.339,1.017],"#w šest":[44.406,0.882],"#w šeststo":[45.339,0.889],"#w šezdeset":[46.278,1.023],"233 km mjesečno":[47.351,2.45],"70 km":[49.851,1.48],"adresa":[51.381,0.733],"ako ga već imaš samo ponesi kopiju":[52.164,2.727],"ako je imaš samo ponesi kopiju":[54.941,2.454],"ako ne znaš gdje je šalter javi se zaštitaru na ulazu":[57.445,3.563],"ako primaš penziju":[61.058,1.435],"ako si nezaposlen":[62.542,1.353],"albina i franje herljevića":[63.945,1.969],"albina i franje herljevića 1 tuzla":[65.965,2.806],"bosne srebrene":[68.82,1.246],"bosne srebrene 31 tuzla":[70.117,2.595],"broj djece na redovnom školovanju":[72.762,2.155],"broj djece predškolskog uzrasta nisu u sistemu redovnog školovanja":[74.966,4.365],"broj članova nesposobnih za rad ili sa invaliditetom":[79.381,3.456],"centar procjenjuje svaki slučaj posebno":[82.887,2.647],"centar procjenjuje svaki slučaj posebno prema članu":[85.584,3.479],"centar procjenjuje svaki slučaj posebno prema članu 22":[89.113,4.147],"centar za socijalni rad":[93.31,1.742],"centar za socijalni rad djeca do":[95.102,2.434],"centar za socijalni rad djeca do 6 godina":[97.586,3.096],"da li je od prestanka prethodnog osiguranja posla škole prošlo manje od":[100.732,4.684],"da li je od prestanka prethodnog osiguranja posla škole prošlo manje od 30 dana":[105.466,5.395],"da li je osoba korisnik stalne novčane pomoći":[110.911,3.242],"da li je osoba trenutno nezaposlena i prijavljena birou rada":[114.203,3.719],"da li je ovo dijete zaposleno":[117.972,1.979],"da li podnosilac ima djecu ili je ikada bio bila u braku npr":[120.001,4.16],"da li podnosilac živi sam bez bračnog partnera i djece u domaćinstvu":[124.211,4.707],"da manje od":[128.968,1.45],"da manje od 30 dana ne prošlo je više vremena":[130.468,3.358],"da ne ali je zaposlena nezaposlena nastaviti":[133.876,3.121],"da ne nikada":[137.047,1.424],"da nezaposlena je ne nije prijavljena na biro a nema osiguranje ni po jednom drugom osnovu":[138.521,5.643],"da živ je ne preminuo je potreban je izvod iz matične knjige umrlih":[144.213,4.277],"dana":[148.54,0.653],"dana ne prošlo je više vremena":[149.244,2.185],"dana od prestanka prethodnog osiguranja zdravstveno osiguranje se ostvaruje preko biroa rada":[151.479,5.551],"dijete do":[157.08,0.932],"dijete do 6 godina 65 godina ili više od 6 do 64 godine":[158.062,5.145],"djeca predškolskog uzrasta koja nisu osigurana po drugom osnovu npr":[163.257,4.489],"do":[167.796,0.562],"do 437 km":[168.408,2.293],"do 437 km pojedinac 729 km porodica":[170.751,5.605],"do 729 km":[176.407,2.26],"dodatak po članu domaćinstva koji je nesposoban za rad ili se redovno školuje":[178.717,4.92],"dokaz o prebivalištu boravištu pba":[183.686,2.954],"dokaz o prebivalištu boravištu pba 4":[186.691,3.092],"dokaz o prestanku prethodnog osiguranja rješenje o prestanku radnog odnosa potvrda o završetku školovanja i sl":[189.832,7.156],"dom zdravlja mustafa šehović":[197.038,2.5],"dovoljno je pribaviti uvjerenje o nezaposlenosti sa biroa rada ili porezne uprave dodatni prihodi se ne dokazuju":[199.588,6.762],"druga teška socijalna situacija":[206.4,2.344],"federalni zavod pio mio":[208.794,1.821],"franjevačka":[210.665,1.001],"franjevačka 36 tuzla":[211.716,2.568],"glas se učitava sačekajte trenutak":[214.333,2.663],"godina":[217.046,0.726],"godina bez osiguranja po drugom osnovu predaju poseban zahtjev sa dokumentacijom ispod":[217.822,5.243],"godina da li posjeduje nalaz komisije o radnoj nesposobnosti":[223.115,4.121],"godina ili više od":[227.285,1.66],"godine":[228.995,0.747],"grad tuzla":[229.793,1.038],"grad tuzla geodetska i imovinsko pravna služba":[230.88,3.383],"greška pri pokretanju glasovnog čitanja":[234.313,2.931],"ima li osoba za koju se traži osiguranje prijavljeno prebivalište na području grada tuzla":[237.294,5.266],"ima li podnosilac djecu koja ne žive s njim a po porodičnom zakonu fbih su obavezna na izdržavanje":[242.61,6.27],"ima li podnosilac zahtjeva prijavljeno prebivalište na području grada tuzla najmanje":[248.929,4.944],"ima li podnosilac zahtjeva prijavljeno prebivalište na području grada tuzla najmanje 6 mjeseci":[253.923,5.941],"ispod zakonskog cenzusa od":[259.914,2.103],"iz viber messenger linka":[262.067,2.048],"izaberi mjesto sa liste":[264.165,1.822],"izabrati vrstu pomoći uslovi će biti objašnjeni a potom se po želji sastavlja i ruta do ustanova":[266.037,6.317],"izlazak iz zatvora nakon odgojne mjere":[272.404,2.475],"iznad zakonskog cenzusa od":[274.929,2.086],"iznos se određuje prema prosječnoj plaći ostvarenoj u tuzlanskom kantonu u prethodnoj godini":[277.066,5.097],"izostanak sa javljanja može dovesti do brisanja sa evidencije i gubitka osiguranja":[282.213,4.859],"izuzetno do":[287.122,1.067],"izuzetno do 4 374 km":[288.239,3.555],"izvod iz matične knjige rođenih":[291.844,2.236],"izvod iz matične knjige rođenih za dijete":[294.13,2.642],"je preminuo potreban izvod iz matične knjige umrlih ne može biti obveznik izdržavanja":[296.823,5.463],"jedan uslov zahtijeva dodatnu provjeru":[302.336,2.412],"kad je više djece istovremeno u mogućnosti pomoći obaveza izdržavanja se dijeli među njima prema njihovim mogućnostima član":[304.798,7.219],"kad je više djece istovremeno u mogućnosti pomoći obaveza izdržavanja se dijeli među njima prema njihovim mogućnostima član 223":[312.068,8.23],"kad uđeš uzmi broj ako postoji aparat":[320.348,2.971],"km od prethodne stanice":[323.369,1.702],"kod teške bolesti izuzetno i do":[325.121,2.561],"kod teške bolesti izuzetno i do 4374 km":[327.732,4.827],"kojoj starosnoj kategoriji osoba pripada":[332.609,2.654],"koliko djece punoljetnih treba provjeriti pojedinačno":[335.313,3.625],"koliko domaćinstvo ukupno prima mjesečno u km":[338.988,3.553],"koliko godina ima podnosilac zahtjeva":[342.591,2.639],"koliko članova ima domaćinstvo uključujući podnosioca zahtjeva":[345.28,4.194],"konačnu ocjenu daje stručni tim centra za socijalni rad":[349.524,3.48],"kontakt sa srodnicima je nepoznat ili prekinut":[353.054,3.01],"kontakt sa srodnicima nije poznat":[356.114,2.311],"kopija prijave prebivališta cips":[358.474,2.639],"kopija prijave prebivališta cips za dijete":[361.163,3.362],"kopija prijave prebivališta cips za roditelje staratelje":[364.575,3.994],"korisnici stalne novčane pomoći ostvaruju zdravstveno osiguranje automatski na osnovu rješenja o stalnoj novčanoj pomoći nije potreban poseban zahtjev":[368.618,8.951],"kozaračka tuzla":[377.62,1.59],"kućna lista":[379.26,1.248],"lična karta":[380.558,1.12],"lična karta podnosioca":[381.729,1.88],"maršala tita":[383.659,1.18],"maršala tita 151 tuzla":[384.889,2.709],"matični ured zgrada grada tuzla":[387.648,2.569],"medicinska dokumentacija":[390.267,1.907],"mjeseci":[392.225,0.877],"mjeseci je osnovni uslov za sve oblike pomoći član":[393.151,3.46],"mjesečna pomoć za osobe i porodice bez dovoljno prihoda za izdržavanje":[396.661,4.356],"mjesečna pomoć za osobe i porodice koje nemaju dovoljno prihoda za izdržavanje":[401.067,4.771],"mjesečno":[405.888,0.945],"mup tuzlanski kanton":[406.883,1.715],"nadležni centar za socijalni rad predaja zahtjeva":[408.648,3.444],"nalaz ne stariji od":[412.142,1.562],"nalaz ne stariji od 6 mjeseci":[413.754,2.393],"napomena":[416.198,1.177],"nastaviti na listu dokumenata nazad ispraviti odgovor nazad na početnu":[417.424,4.601],"nastaviti na listu dokumenata nazad odabrati drugu situaciju nazad na početnu":[422.075,4.982],"nazad na početnu":[427.107,1.426],"nazad na prethodno dijete":[428.583,1.803],"ne postoje srodnici u odvojenom domaćinstvu obavezni na izdržavanje uslov je ispunjen":[430.436,5.204],"nema dodatnog odlaska u centar":[435.69,2.094],"nema prihode u inostranstvu uz prevedenu potvrdu nadležnog stranog organa smatra se da nije u mogućnosti izvršavati obavezu izdržavanja":[437.834,8.251],"nezaposlen uz uvjerenje sa biroa rada ili porezne uprave po članu":[446.134,4.486],"nezaposlen uz uvjerenje sa biroa rada ili porezne uprave po članu 16":[450.67,4.961],"nije moguće dobiti lokaciju":[455.681,1.955],"nije u mogućnosti izvršavati obavezu izdržavanja":[457.685,3.186],"nijedan odabrani dokument ne zahtijeva odlazak pogledaj napomene ispod":[460.922,4.573],"njegova njena mjesečna plaća km sastav njegovog njenog domaćinstva on ona i bračni partner se broje u odrasli":[465.545,6.788],"nosi original samo na uvid":[472.383,2.35],"notar":[474.783,0.795],"o nezaposlenosti ili primanju socijalne pomoći prevedena kod ovlaštenog sudskog tumača u bih":[475.628,6.004],"obavijest o tekućem računu":[481.682,1.939],"od":[483.671,0.495],"od prethodne stanice":[484.216,1.597],"odluku donosi stručni tim centra na osnovu medicinske dokumentacije":[485.862,4.216],"odrasli":[490.129,0.757],"odrasli 18":[490.936,1.776],"ona ne predstavlja službenu odluku":[492.761,2.142],"osiguranje ostaje aktivno samo dok je osoba uredno prijavljena potrebno je redovno se javljati birou prema određenim terminima":[494.953,7.217],"osnov":[502.22,0.646],"osnovni iznos":[502.917,1.618],"osobe starije od":[504.585,1.486],"osobe starije od 65 godina bez osiguranja po drugom osnovu predaju poseban zahtjev sa dokumentacijom ispod":[506.12,6.924],"ovaj podatak se koristi kroz cijelu provjeru za radnu sposobnost zdravstveno osiguranje i cenzuse srodnika pa se ne ponavlja više puta":[513.095,8.13],"ovaj preglednik uređaj ne podržava glasovno čitanje web speech api":[521.274,4.419],"ovaj telefon vjerovatno nema instaliran aktivan glas za čitanje teksta":[525.743,4.395],"ovdje uzimaš":[530.188,1.554],"ovi podaci određuju i procijenjeni iznos pomoći jer se za svakog nesposobnog člana i dijete na školovanju priznaje dodatak":[531.792,7.098],"ovjerava se kod notara":[538.94,1.619],"ovjerena izjava da nema sredstava za izdržavanje":[540.608,3.087],"ovjerena izjava da nemaš primanja iz inostranstva":[543.745,3.039],"ovo je orijentaciona procjena bazirana na važećim zakonskim propisima":[546.834,4.428],"ovo je orijentaciona procjena bazirana na važećim zakonskim propisima i striktno zavisi od tačnosti unesenih podataka":[551.312,7.182],"ovo ne zahtijeva posebnu adresu na ruti":[558.543,2.87],"ovo pribavlja centar po službenoj dužnosti ne moraš ići":[561.464,3.596],"pba":[565.11,0.719],"po članu":[565.88,0.822],"po članu 16":[566.752,1.47],"po članu 216":[568.272,1.81],"po članu domaćinstva ispod zakonskog cenzusa od":[570.132,3.413],"po članu domaćinstva iznad zakonskog cenzusa od":[573.594,3.418],"podnosilac ima manje od":[577.062,1.798],"podnosilac ima manje od 65 godina da li posjeduje nalaz komisije o radnoj nesposobnosti":[578.911,6.189],"podnosioca da li je živ":[585.149,1.824],"pojedinac":[587.023,0.983],"pomoć za hitnu situaciju bolest smrt u porodici povratak s liječenja i slično":[588.057,5.346],"pomoć za jednu konkretnu tešku situaciju ne isplaćuje se mjesečno":[593.453,4.385],"ponesi otpusno pismo iz bolnice":[597.888,2.281],"ponesi potvrdu o otpuštanju":[600.22,2.137],"porezna uprava":[602.407,1.186],"porodica":[603.643,0.833],"porodičnog zakona fbih dužan je izdržavati podnosioca dok nesposobnost traje":[604.526,4.99],"porodičnog zakona fbih ne mora je snositi samo jedno dijete":[609.566,3.774],"porodičnog zakona fbih obavezan je učestvovati u izdržavanju":[613.39,3.927],"postavke telefona pristupačnost ili jezik i unos tekst u govor da li je odabran i preuzet glas hrvatski srpski bosanski ili engleski kao zamjena":[617.367,9.484],"postoji nekoliko zakonskih osnova za ostvarivanje zdravstvenog osiguranja kada ono ne postoji po osnovu zaposlenja":[626.901,6.467],"potrebna je potvrda nadležnog inostranog organa npr":[633.418,3.65],"potrebna je terenska provjera socijalnog radnika i odluka stručnog tima centra prije konačne ocjene ovog uslova":[637.117,6.454],"potrebna prevedena platna i kućna lista":[643.621,2.736],"potrebno je dostaviti platnu listu i kućnu listu iz zemlje boravka prevedene kod ovlaštenog sudskog tumača u bih":[646.407,7.103],"potrebno je prvo prijaviti prebivalište prijavljeno prebivalište na području grada tuzla u trajanju od najmanje":[653.56,6.209],"potrebno je prvo prijaviti prebivalište prijavljeno prebivalište na području grada tuzla u trajanju od najmanje 6 mjeseci je osnovni uslov za sve oblike pomoći član 6":[659.819,9.822],"potvrda o školovanju":[669.69,1.616],"povratak s liječenja":[671.356,1.473],"pravo na jednokratnu pomoć može se priznati istoj osobi ili porodici najviše tri puta u toku kalendarske godine":[672.879,6.6],"pravo se priznaje najviše tri puta godišnje istoj osobi ili porodici":[679.529,4.307],"pravo se priznaje uz izvod iz matične knjige umrlih":[683.886,3.216],"predaješ papire":[687.152,1.26],"predaješ sve skupljene papire ovdje":[688.462,2.441],"preko roditelja ostvaruju zdravstveno osiguranje preko centra za socijalni rad":[690.953,4.711],"prema zakonu o zdravstvenom osiguranju fbih članu":[695.714,3.261],"prema zakonu o zdravstvenom osiguranju fbih članu 38":[699.025,4.068],"prema članu":[703.143,1.0],"prema članu 22":[704.192,1.682],"presuda o razvodu izdržavanju":[705.924,2.172],"pri zakonskom cenzusu od":[708.146,1.91],"prihod po članu domaćinstva iznosi":[710.106,2.373],"prihodi domaćinstva radna sposobnost i postojanje srodnika koji su po zakonu u mogućnosti pružiti izdržavanje":[712.529,6.745],"prijava prebivališta boravišta pba":[719.324,2.864],"prijava prebivališta boravišta pba 1 pba 3":[722.238,3.638],"prijavom na evidenciju nezaposlenih u roku od":[725.926,2.921],"prijavom na evidenciju nezaposlenih u roku od 30 dana od prestanka prethodnog osiguranja zdravstveno osiguranje se ostvaruje preko biroa rada":[728.896,8.418],"prikazati rezultat":[737.364,1.502],"pristupačnost tekst u govor text to speech":[738.916,3.168],"probaj otvoriti stranicu u chrome u ili safariju umjesto u ugrađenom pregledniku aplikacije npr":[742.134,5.962],"provjeri":[748.145,1.035],"provjeri u postavkama telefona":[749.23,2.455],"provjerom uslova utvrđuje se koji osnov odgovara konkretnoj situaciji":[751.735,4.198],"prva stanica":[755.984,1.105],"rezultat striktno zavisi od tačnosti unesenih podataka i ne predstavlja službenu odluku":[757.139,5.109],"rješenje o invalidnosti pomoći dodatku":[762.298,2.642],"rudarska":[764.99,1.06],"rudarska 72 tuzla":[766.1,2.371],"ruta je spremna":[768.521,1.157],"sastav domaćinstva djeca i nesposobni članovi":[769.728,3.19],"sastaviti rutu do ovih ustanova nazad ispraviti odgovor nazad na početnu":[772.968,4.759],"služba za zapošljavanje biro rada":[777.776,2.435],"služba za zapošljavanje tk biro rada":[780.261,2.787],"službene novine tuzlanskog kantona":[783.098,2.397],"smrt člana porodice":[785.545,1.726],"stanica":[787.321,0.906],"stav":[788.277,0.697],"stav 2":[789.024,0.917],"svako dijete se procjenjuje posebno različita zaposlenja plaće i porodične situacije daju različit rezultat po djetetu":[789.991,7.027],"telefon je odbio da pročita tekst naglas":[797.068,2.883],"teška bolest i liječenje":[800.001,1.911],"turalibegova bb tuzla":[801.962,1.972],"tuzla":[803.984,0.627],"u ovakvim slučajevima socijalni radnik provodi terensku provjeru razgovor sa susjedima provjera dolazaka i sačinjava službenu zabilješku":[804.661,8.115],"u skladu sa članom":[812.826,1.443],"u skladu sa članom 107":[814.319,2.004],"udovac udovica razveden":[816.373,2.175],"ukoliko se okolnosti promijene pravo se može ponovo ispitati podnošenje zahtjeva se svejedno preporučuje":[818.598,6.361],"ukoliko se utvrdi da srodnici ne dolaze i ne pomažu predmet se iznosi pred stručni tim centra koji odlučuje o pravu na osnovu utvrđenog stanja socijalne potrebe":[825.009,9.358],"uslov je ispunjen":[834.417,1.307],"uslov nije ispunjen":[835.773,1.498],"uslovi se provjeravaju prema trima kriterijima":[837.321,3.1],"uslovi su ispunjeni":[840.472,1.467],"uslovi trenutno nisu ispunjeni":[841.988,2.174],"ustanova":[844.213,1.127],"uvjerenje boračko invalidska zaštita":[845.39,2.866],"uvjerenje da dijete nije osigurano po drugom osnovu":[848.306,3.163],"uvjerenje da osiguranje ne postoji po drugom osnovu":[851.519,3.162],"uvjerenje da osoba nije osigurana po drugom osnovu":[854.732,3.248],"uvjerenje da si na evidenciji biro rada":[858.03,2.697],"uvjerenje geodetska i imovinsko pravna služba":[860.777,3.22],"uvjerenje iz porezne uprave":[864.047,1.915],"uvjerenje o državljanstvu":[866.011,1.78],"uvjerenje o primanjima ček od penzije pio mio":[867.841,3.158],"vadi se u tvojoj banci":[871.049,1.574],"vadi se u školi ili na fakultetu adresa zavisi od ustanove":[872.673,4.122],"za osobe bez zdravstvenog osiguranja po drugom osnovu":[876.844,3.37],"za osobe u stanju socijalne potrebe koje nisu osigurane po drugom osnovu a imaju prijavljeno prebivalište na području grada doprinos za zdravstveno osiguranje plaća grad tuzla iz budžeta":[880.264,10.791],"za pojedinca":[891.105,1.449],"za porodicu":[892.604,1.348],"za tačan podatak potrebno je kontaktirati sina ili kćerku":[894.002,3.777],"zahtjev nadležnoj gradskoj službi":[897.829,2.247],"zahtjev se predaje na posljednjoj stanici":[900.125,2.59],"zakona":[902.765,0.852],"zakona i članu":[903.667,1.439],"zakona i članu 219":[905.156,2.375],"zakona o pravu u prvom stupnju rješenjem odlučuje nadležni centar za socijalni rad na osnovu podnesenog zahtjeva i cjelokupne dokumentacije":[907.581,8.578],"zakona o socijalnoj zaštiti tk":[916.209,2.425],"zakona o socijalnoj zaštiti tk i dostupnoj dokumentaciji nadležnih ustanova te odluci grada tuzla o finansiranju zdravstvenog osiguranja socijalno ugroženih osoba":[918.684,9.611],"zakona pa ovdje nema fiksnog testa ispunjenosti uslova prikazani su najviši mogući iznosi po vrsti situacije":[928.344,6.877],"zakona se smatra da nije u mogućnosti izvršavati obavezu izdržavanja":[935.272,4.31],"zaposlen u bih nezaposlen na birou rada zaposlen u inostranstvu u inostranstvu nezaposlen ili na socijalnoj pomoći napomena":[939.631,7.906],"zavnobih a":[947.588,1.212],"zavnobih a 11 tuzla":[948.85,2.271],"zavod zdravstvenog osiguranja tk":[951.171,2.397],"zvuk se nije pokrenuo":[953.617,1.663]};
+// ===== Reprodukcija: Web Audio, jedan zvučni fajl (glas-bs.mp3), bez interneta nakon prvog učitavanja =====
+var VOICE_SRC = "glas-bs.mp3?v=3";
+var __vctx=null, __vbuf=null, __vload=null, __vsrcs=[], __vtoken=0;
+function __voiceCtx(){ if(!__vctx){ var C=window.AudioContext||window.webkitAudioContext; if(C) __vctx=new C(); } return __vctx; }
+function __voiceLoad(){
+  if(__vbuf) return Promise.resolve(__vbuf);
+  if(!__vload){
+    var ctx=__voiceCtx();
+    __vload = fetch(VOICE_SRC).then(function(r){ if(!r.ok) throw new Error("http "+r.status); return r.arrayBuffer(); })
+      .then(function(ab){ return new Promise(function(res,rej){ ctx.decodeAudioData(ab,res,rej); }); })
+      .then(function(b){ __vbuf=b; return b; })
+      .catch(function(e){ __vload=null; throw e; });
   }
-  if(!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined'){
-    alert('Ovaj preglednik/uređaj ne podržava glasovno čitanje (Web Speech API). Probaj otvoriti stranicu u Chrome-u ili Safariju umjesto u ugrađenom pregledniku aplikacije (npr. iz Viber/Messenger linka).');
-    return;
-  }
-  try{
-    if(window.speechSynthesis.speaking || window.speechSynthesis.pending){
-      window.speechSynthesis.cancel();
-    }
-    // Kratka pauza prije govora — na iPhone/Safari, govor odmah nakon cancel() ponekad tiho ne krene.
-    setTimeout(()=>{
-      const u = new SpeechSynthesisUtterance(text);
-      let voices = __cachedVoices.length ? __cachedVoices : window.speechSynthesis.getVoices();
-      const bsVoice = voices.find(v=>/^bs/i.test(v.lang)) || voices.find(v=>/^hr/i.test(v.lang)) || voices.find(v=>/^sr/i.test(v.lang));
-      if(bsVoice) u.voice = bsVoice;
-      u.lang = bsVoice ? bsVoice.lang : 'hr-HR';
-      u.rate = 0.95;
-      let startedOk = false;
-      u.onstart = () => { startedOk = true; };
-      u.onerror = () => {
-        alert('Telefon je odbio da pročita tekst naglas. Provjeri: Postavke telefona → Pristupačnost (ili Jezik i unos) → Tekst u govor → da li je odabran i preuzet glas (hrvatski/srpski/bosanski ili engleski kao zamjena).');
-      };
-      window.speechSynthesis.speak(u);
-      // Ako ni nakon 1.2 sekunde govor stvarno nije počeo, uređaj vjerovatno nema aktivan TTS motor.
-      setTimeout(()=>{
-        if(!startedOk && !window.speechSynthesis.speaking){
-          alert('Zvuk se nije pokrenuo. Ovaj telefon vjerovatno nema instaliran/aktivan glas za čitanje teksta. Provjeri u Postavkama telefona: Pristupačnost → Tekst u govor (Text-to-Speech).');
-        }
-      }, 1200);
-    }, 60);
-  } catch(e){
-    alert('Greška pri pokretanju glasovnog čitanja: ' + e.message);
-  }
+  return __vload;
 }
+function stopSpeech(){
+  __vtoken++;
+  __vsrcs.forEach(function(s){ try{ s.stop(); }catch(e){} }); __vsrcs=[];
+  if(window.speechSynthesis){ try{ window.speechSynthesis.cancel(); }catch(e){} }
+  document.querySelectorAll('.speaking').forEach(function(b){ b.classList.remove('speaking'); });
+}
+function __voiceToast(msg){
+  var t=document.getElementById('voiceToast');
+  if(!t){ t=document.createElement('div'); t.id='voiceToast'; t.style.cssText='position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#1f2d3d;color:#fff;padding:10px 16px;border-radius:12px;font-size:15px;z-index:9999;max-width:90%;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,.25);transition:opacity .3s'; document.body.appendChild(t); }
+  t.textContent=msg; t.style.opacity='1'; clearTimeout(t.__h); t.__h=setTimeout(function(){ t.style.opacity='0'; },2600);
+}
+function __deviceVoice(){ if(!('speechSynthesis' in window)) return null; var vs=window.speechSynthesis.getVoices()||[]; return vs.find(function(v){return /^bs/i.test(v.lang);})||vs.find(function(v){return /^hr/i.test(v.lang);})||vs.find(function(v){return /^sr/i.test(v.lang);})||null; }
+function speakText(text, btnEl){
+  var wasPlaying = btnEl && btnEl.classList.contains('speaking');
+  stopSpeech();
+  if(wasPlaying) return; // drugi klik na isto dugme = zaustavi
+  var my = ++__vtoken;
+  var p = voicePlan(text, VOICE_MAP);
+  var ctx = __voiceCtx();
+  if(!ctx){ __voiceToast('Ovaj preglednik ne podržava reprodukciju zvuka.'); return; }
+  if(ctx.state==='suspended') ctx.resume();
+  if(btnEl){ btnEl.classList.add('speaking'); }
+  var loadingShown=false; var lt=setTimeout(function(){ if(!__vbuf){ loadingShown=true; __voiceToast('Glas se učitava, sačekajte trenutak…'); } },250);
+  __voiceLoad().then(function(buf){
+    clearTimeout(lt);
+    if(my!==__vtoken) return;
+    var t = ctx.currentTime + 0.06;
+    p.plan.forEach(function(it){
+      var seg = VOICE_MAP[it.k]; if(!seg) return;
+      var s = ctx.createBufferSource(); s.buffer = buf; s.connect(ctx.destination);
+      s.start(t, seg[0], seg[1]); __vsrcs.push(s);
+      t += seg[1] + it.gap - 0.10;
+    });
+    var endMs = Math.max(0,(t-ctx.currentTime))*1000;
+    setTimeout(function(){ if(my===__vtoken && btnEl) btnEl.classList.remove('speaking'); }, endMs+200);
+    if(p.misses.length && window.console) console.info('Glas: bez snimka za', p.misses);
+  }).catch(function(){
+    clearTimeout(lt);
+    if(btnEl) btnEl.classList.remove('speaking');
+    var dv=__deviceVoice();
+    if(dv){ var u=new SpeechSynthesisUtterance(voiceClean(text)); u.voice=dv; u.lang=dv.lang; u.rate=0.95; window.speechSynthesis.speak(u); }
+    else __voiceToast('Glas trenutno nije dostupan. Provjerite internet vezu i pokušajte ponovo.');
+  });
+}
+
 // Generiše dugme za preslušavanje bilo kojeg pasusa teksta. Prima čist tekst (bez HTML oznaka).
 function playBtn(plainText){
   return `<button class="play-icon-btn" type="button" aria-label="Preslušaj tekst" onclick='speakText(${JSON.stringify(plainText)}, this)'>🔊</button>`;
@@ -1490,7 +1619,7 @@ function computeAndRenderRoute(){
   ordered.forEach((s,i)=>{
     const card = document.createElement('div');
     card.className = 'stop-card';
-    const distTxt = s.distFromPrev < 1 ? Math.round(s.distFromPrev*1000)+" m od prethodne stanice" : s.distFromPrev.toFixed(1)+" km od prethodne stanice";
+    const distTxt = s.distFromPrev < 1 ? Math.round(s.distFromPrev*1000)+" m od prethodne stanice" : s.distFromPrev.toFixed(1).replace(".",",")+" km od prethodne stanice";
     const shownDist = i===0 ? 'Prva stanica' : distTxt;
     const speech = stopSpeechText(s, i+1, totalStops, shownDist);
     if(i===0) firstStopSpeechText = speech;
@@ -1513,7 +1642,7 @@ function computeAndRenderRoute(){
     finalCard.className = 'stop-card final';
     const lastPoint = ordered.length ? ordered[ordered.length-1] : chosenStart;
     const distToCsr = haversine(lastPoint.lat, lastPoint.lng, INSTITUTIONS.csr.lat, INSTITUTIONS.csr.lng);
-    const distTxt2 = distToCsr < 1 ? Math.round(distToCsr*1000)+" m od prethodne stanice" : distToCsr.toFixed(1)+" km od prethodne stanice";
+    const distTxt2 = distToCsr < 1 ? Math.round(distToCsr*1000)+" m od prethodne stanice" : distToCsr.toFixed(1).replace(".",",")+" km od prethodne stanice";
     const finalStopObj = { name:INSTITUTIONS.csr.name, addr:INSTITUTIONS.csr.addr, docs:["Predaješ sve skupljene papire ovdje"] };
     const finalSpeech = stopSpeechText(finalStopObj, totalStops, totalStops, distTxt2);
     if(totalStops===1) firstStopSpeechText = finalSpeech;
