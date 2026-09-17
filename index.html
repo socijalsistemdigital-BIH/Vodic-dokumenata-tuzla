@@ -58,13 +58,6 @@
 <style>
   .play-icon-btn.speaking, .speak-btn.speaking{ animation: vPulse 1s ease-in-out infinite; }
   @keyframes vPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.15); } }
-  #accessGate{ position:fixed; inset:0; background:#FAFAF6; z-index:100000; display:flex; align-items:center; justify-content:center; padding:24px; }
-  #accessGate .box{ max-width:420px; width:100%; background:#fff; border-radius:18px; padding:28px 22px; box-shadow:0 6px 30px rgba(0,0,0,.08); text-align:center; font-family:'Atkinson Hyperlegible',system-ui,sans-serif; }
-  #accessGate h1{ font-size:24px; margin:6px 0 10px; color:#1d3557; }
-  #accessGate p{ font-size:16px; line-height:1.5; color:#333; margin:0 0 14px; }
-  #accessGate input{ width:100%; box-sizing:border-box; font-size:20px; padding:12px; border:2px solid #cfd8e3; border-radius:12px; text-align:center; letter-spacing:2px; }
-  #accessGate button{ margin-top:12px; width:100%; font-size:18px; padding:13px; border:0; border-radius:12px; background:#1d3557; color:#fff; font-weight:700; }
-  #accessGate .err{ color:#b00020; min-height:22px; font-size:15px; margin-top:8px; }
 
   :root{
     --paper:#FAFAF6;
@@ -74,8 +67,8 @@
     --blue:#1F4FA3;
     --blue-dark:#153A7C;
     --blue-pale:#E8EFFB;
-    --coral:#FF6A45;
-    --coral-dark:#E14E2A;
+    --coral:#CC4422;
+    --coral-dark:#A8361A;
     --done:#1E9A5C;
     --warn:#B8860B;
     --line:#E2DFD3;
@@ -119,7 +112,6 @@
   }
   h1,h2,h3{font-weight:700;}
   .view{display:none;}
-  html.locked .view, html.locked .footer-bar{display:none!important;}
   .view.active{display:block;}
 
   /* ===== HEADER ===== */
@@ -179,7 +171,7 @@
     cursor:pointer;
     text-align:center;
     text-decoration:none;
-    box-shadow:0 4px 14px rgba(255,106,69,0.35);
+    box-shadow:0 4px 14px rgba(204,68,34,0.30);
   }
   .btn-primary:active{background:var(--coral-dark);}
   .btn-primary:disabled{background:#C9C4B4;box-shadow:none;cursor:not-allowed;}
@@ -373,7 +365,7 @@
     display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;
     color:var(--coral-dark);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;
   }
-  .stop-card.final .stop-num{color:var(--done);}
+  .stop-card.final .stop-num{color:#17804B;}
   .stop-name{font-size:21px;font-weight:700;margin-bottom:2px;}
   .stop-addr{color:var(--ink-soft);font-size:15px;margin-bottom:10px;}
   .stop-dist{
@@ -420,33 +412,7 @@
 </style>
 </head>
 <body>
-<div id="accessGate">
-  <div class="box">
-    <div style="font-size:40px">🔒</div>
-    <h1>Vodič do dokumenata</h1>
-    <p>Aplikacija je u fazi pilot testiranja i nije javno dostupna.</p>
-    <p>Pristupni kod dobijate na upit:<br><b>adnandrndic87@gmail.com</b></p>
-    <input id="gateCode" type="text" autocomplete="off" placeholder="Pristupni kod" onkeydown="if(event.key==='Enter')gateTry()">
-    <button type="button" onclick="gateTry()">Otvori aplikaciju</button>
-    <div class="err" id="gateErr"></div>
-  </div>
-</div>
-<script>
-(function(){
-  var H="0fdaaf854a8b25d097790ac8aa5f99a19df5bda95602658a06a6e3e92595982e";
-  var root=document.documentElement; root.classList.add('locked');
-  try{ if(localStorage.getItem('vodic_pristup')===H){ var g=document.getElementById('accessGate'); if(g) g.remove(); root.classList.remove('locked'); } }catch(e){}
-  window.gateTry=function(){
-    var v=(document.getElementById('gateCode').value||'').trim().toUpperCase();
-    if(!window.crypto||!crypto.subtle){ document.getElementById('gateErr').textContent='Preglednik ne podržava provjeru koda.'; return; }
-    crypto.subtle.digest('SHA-256', new TextEncoder().encode(v)).then(function(buf){
-      var h=Array.prototype.map.call(new Uint8Array(buf),function(x){return ('0'+x.toString(16)).slice(-2);}).join('');
-      if(h===H){ try{localStorage.setItem('vodic_pristup',H);}catch(e){} document.getElementById('accessGate').remove(); root.classList.remove('locked'); }
-      else document.getElementById('gateErr').textContent='Pogrešan kod. Kod se dobija na upit putem e-maila.';
-    });
-  };
-})();
-</script>
+
 
 
 <!-- ============ LANDING ============ -->
@@ -521,11 +487,11 @@
       <div class="intro-facts">
         <div class="text-with-play">
           <div class="txt">
-            <p style="margin:0 0 8px"><b>Osnovni iznos:</b> 233 KM mjesečno</p>
-            <p style="margin:0 0 8px"><b>Dodatak</b> po članu domaćinstva koji je nesposoban za rad ili se redovno školuje: 70 KM</p>
+            <p style="margin:0 0 8px"><b>Osnovni iznos:</b> <span class="js-snp">233 KM</span> mjesečno</p>
+            <p style="margin:0 0 8px"><b>Dodatak</b> po članu domaćinstva koji je nesposoban za rad ili se redovno školuje: <span class="js-dod">70 KM</span></p>
             <p style="margin:0">Uslovi se provjeravaju prema trima kriterijima: prihodi domaćinstva, radna (ne)sposobnost, i postojanje srodnika koji su po zakonu u mogućnosti pružiti izdržavanje.</p>
           </div>
-          <button class="play-icon-btn" type="button" aria-label="Preslušaj tekst" onclick="speakText('Osnovni iznos: 233 KM mjesečno. Dodatak po članu domaćinstva koji je nesposoban za rad ili se redovno školuje: 70 KM. Uslovi se provjeravaju prema trima kriterijima: prihodi domaćinstva, radna sposobnost, i postojanje srodnika koji su po zakonu u mogućnosti pružiti izdržavanje.', this)">🔊</button>
+          <button class="play-icon-btn" type="button" aria-label="Preslušaj tekst" onclick="speakText('Osnovni iznos: ' + SNP_TXT() + ' mjesečno. Dodatak po članu domaćinstva koji je nesposoban za rad ili se redovno školuje: ' + DOD_TXT() + '. Uslovi se provjeravaju prema trima kriterijima: prihodi domaćinstva, radna sposobnost, i postojanje srodnika koji su po zakonu u mogućnosti pružiti izdržavanje.', this)">🔊</button>
         </div>
       </div>
       <div class="btn-stack">
@@ -547,11 +513,11 @@
       <div class="intro-facts">
         <div class="text-with-play">
           <div class="txt">
-            <p style="margin:0 0 8px"><b>Za pojedinca:</b> do 437 KM</p>
-            <p style="margin:0 0 8px"><b>Za porodicu:</b> do 729 KM</p>
-            <p style="margin:0">Kod teške bolesti, izuzetno i do 4.374 KM. Pravo se priznaje najviše tri puta godišnje istoj osobi ili porodici.</p>
+            <p style="margin:0 0 8px"><b>Za pojedinca:</b> do <span class="js-jk-poj">437 KM</span></p>
+            <p style="margin:0 0 8px"><b>Za porodicu:</b> do <span class="js-jk-por">729 KM</span></p>
+            <p style="margin:0">Kod teške bolesti, izuzetno i do <span class="js-jk-izu">4.374 KM</span>. Pravo se priznaje najviše tri puta godišnje istoj osobi ili porodici.</p>
           </div>
-          <button class="play-icon-btn" type="button" aria-label="Preslušaj tekst" onclick="speakText('Za pojedinca: do 437 KM. Za porodicu: do 729 KM. Kod teške bolesti, izuzetno i do 4374 KM. Pravo se priznaje najviše tri puta godišnje istoj osobi ili porodici.', this)">🔊</button>
+          <button class="play-icon-btn" type="button" aria-label="Preslušaj tekst" onclick="speakText('Za pojedinca: do ' + JK_POJ + '. Za porodicu: do ' + JK_POR + '. Kod teške bolesti, izuzetno i do ' + JK_IZU + '. Pravo se priznaje najviše tri puta godišnje istoj osobi ili porodici.', this)">🔊</button>
         </div>
       </div>
       <div class="btn-stack">
@@ -626,7 +592,10 @@
 
 <script>
 // ================== NAVIGATION ==================
-function goTo(id){
+// Sistemsko dugme "nazad" na telefonu vraća na prethodni ekran aplikacije umjesto da zatvori aplikaciju.
+function goTo(id, izHistorije){
+  const trenutni = document.querySelector('.view.active');
+  if(!izHistorije && trenutni && trenutni.id !== id){ try{ history.pushState({ v:id }, '', ''); }catch(e){} }
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.getElementById('footerBar').style.display = (id==='view-checklist') ? 'block' : 'none';
@@ -641,6 +610,12 @@ function goTo(id){
   window.scrollTo(0,0);
 }
 
+try{ history.replaceState({ v:'view-landing' }, '', ''); }catch(e){}
+window.addEventListener('popstate', function(e){
+  const v = (e.state && e.state.v && document.getElementById(e.state.v)) ? e.state.v : 'view-landing';
+  goTo(v, true);
+});
+
 // ================== LEGAL CONSTANTS (Zakon o socijalnoj zaštiti TK, precišćeni tekst; ================
 // Instrukcija Ministarstva za rad, socijalnu politiku i povratak TK za 2026.) ==================
 //
@@ -648,7 +623,8 @@ function goTo(id){
 // Ministarstvo objavljuje novu Instrukciju obično početkom svake godine, sa novom osnovicom
 // (prosječna neto plaća TK za prethodnu godinu). Kad izađe nova instrukcija:
 //   1. Promijeniti samo broj OSNOVICA ispod (npr. sa 1458 na novi iznos)
-//   2. Sve ostalo (233 KM, 70 KM, cenzusi...) se automatski preračuna, jer su izvedeni iz OSNOVICA
+//   2. Sve ostalo (233 KM, 70 KM, 437/729/4.374 KM, cenzusi, i iznosi na uvodnim ekranima) se automatski preračuna, jer su izvedeni iz OSNOVICA
+//      Glas ne treba ponovo snimati: brojevi se slažu od snimljenih riječi.
 //   3. Provjeriti da li su se promijenili i sami procenti (PCT) — to se rjeđe dešava,
 //      ali ako Skupština TK izmijeni Zakon, treba provjeriti članove 13., 14. i 16. Zakona.
 // Izvor za provjeru: "Službene novine Tuzlanskog kantona" i objave Ministarstva (npr. tuzlainfo.ba,
@@ -989,10 +965,11 @@ function renderRoditeljiDetalji(){
   const r = qs.roditeljiList[idx];
   const labelUloga = r.uloga === 'majka' ? 'Majka' : 'Otac';
 
-  qsShell(`${labelUloga} podnosioca — da li je živ/a?`, `
+  const zivTxt = r.uloga === 'majka' ? 'živa' : 'živ', premTxt = r.uloga === 'majka' ? 'preminula' : 'preminuo', njTxt = r.uloga === 'majka' ? 'njenog' : 'njegovog', starTxt = r.uloga === 'majka' ? 'starija' : 'stariji';
+  qsShell(`${labelUloga} podnosioca — da li je ${zivTxt}?`, `
     <div class="quiz-options" id="roditeljZivOpts">
-      <button class="quiz-opt" onclick="roditeljZiv(true)">Da, živ/a je</button>
-      <button class="quiz-opt" onclick="roditeljZiv(false)">Ne, preminuo/la je</button>
+      <button class="quiz-opt" onclick="roditeljZiv(true)">Da, ${zivTxt} je</button>
+      <button class="quiz-opt" onclick="roditeljZiv(false)">Ne, ${premTxt} je</button>
     </div>
     <div id="roditeljPreminuoBlok" style="display:none">
       <div class="disclaimer" style="margin:14px 0">Potreban je izvod iz matične knjige umrlih.</div>
@@ -1001,13 +978,13 @@ function renderRoditeljiDetalji(){
     <div id="roditeljZivDetaljBlok" style="display:none">
       <label style="font-weight:700;font-size:15px;display:block;margin-top:14px">Ukupni mjesečni prihodi (plaća i/ili penzija, u KM)</label>
       <input class="quiz-amount-input" type="number" inputmode="numeric" min="0" value="0" onchange="qs.roditeljiList[${idx}].plata=amt(this)" oninput="amt(this)">
-      <label style="font-weight:700;font-size:15px">Broj članova njegovog/njenog domaćinstva</label>
+      <label style="font-weight:700;font-size:15px">Broj članova ${njTxt} domaćinstva</label>
       <div class="quiz-number-row">
         <button class="stepper-btn" onclick="roditeljStep(${idx},-1,1)">−</button>
         <div class="stepper-val" id="val-roditeljClanovi-${idx}">${r.clanovi}</div>
         <button class="stepper-btn" onclick="roditeljStep(${idx},1,1)">+</button>
       </div>
-      <label style="font-weight:700;font-size:15px;display:block;margin-top:10px">Da li je stariji/a od 65 godina, ili ima svoj nalaz o radnoj nesposobnosti?</label>
+      <label style="font-weight:700;font-size:15px;display:block;margin-top:10px">Da li je ${starTxt} od 65 godina, ili ima svoj nalaz o radnoj nesposobnosti?</label>
       <p style="color:var(--ink-soft);font-size:14px;margin:2px 0 10px">Ako je odgovor "Da", primjenjuje se viši, blaži prag (60% umjesto 30%).</p>
       <div class="quiz-options">
         <button class="quiz-opt ${r.stariji===true?'selected':''}" onclick="qs.roditeljiList[${idx}].stariji=true; this.parentElement.querySelectorAll('.quiz-opt').forEach(b=>b.classList.remove('selected')); this.classList.add('selected')">Da</button>
@@ -1097,7 +1074,7 @@ function renderRezultatStalna(){
     qs.roditeljiList.forEach(r => {
       const labelUloga = r.uloga === 'majka' ? 'Majka' : 'Otac';
       if(r.ziv === false){
-        roditeljiNapomene.push({ ok:true, text: `${labelUloga} je preminuo/la (potreban izvod iz matične knjige umrlih) — ne može biti obveznik izdržavanja.` });
+        roditeljiNapomene.push({ ok:true, text: `${labelUloga} je ${r.uloga === 'majka' ? 'preminula' : 'preminuo'} (potreban izvod iz matične knjige umrlih) — ne može biti obveznik izdržavanja.` });
       } else if(r.ziv === true){
         const cenz = cenzusSrodnik(r.stariji);
         const poClanu2 = Math.round(r.plata / r.clanovi);
@@ -1106,7 +1083,7 @@ function renderRezultatStalna(){
           roditeljiNapomene.push({ ok:true, text: `${labelUloga} ostvaruje ${KM(poClanu2)} po članu domaćinstva — ispod zakonskog cenzusa od ${KM(cenz)}, nije u mogućnosti izvršavati obavezu izdržavanja.` });
         } else {
           brojSposobnih2++;
-          roditeljiNapomene.push({ ok:false, text: `${labelUloga} ostvaruje ${KM(poClanu2)} po članu domaćinstva — iznad zakonskog cenzusa od ${KM(cenz)}. Po članu 216. stav 2. Porodičnog zakona FBiH, dužan/na je izdržavati podnosioca dok nesposobnost traje.` });
+          roditeljiNapomene.push({ ok:false, text: `${labelUloga} ostvaruje ${KM(poClanu2)} po članu domaćinstva — iznad zakonskog cenzusa od ${KM(cenz)}. Po članu 216. stav 2. Porodičnog zakona FBiH, ${r.uloga === 'majka' ? 'dužna' : 'dužan'} je izdržavati podnosioca dok nesposobnost traje.` });
         }
       }
     });
@@ -1160,6 +1137,13 @@ function renderRezultatStalna(){
 // ================== QUIZ: JEDNOKRATNA NOVČANA POMOĆ ==================
 const JK_POJ = KM(OSNOVICA*0.30), JK_POR = KM(OSNOVICA*0.50), JK_IZU = KM(OSNOVICA*3);
 const JK_STD = `do ${JK_POJ} (pojedinac) / ${JK_POR} (porodica)`;
+const SNP_TXT = () => KM(OSNOVICA * PCT.snp);
+const DOD_TXT = () => KM(Math.round(OSNOVICA * PCT.snp) * PCT.snpDodatak);
+(function popuniUvodneIznose(){
+  const set = (sel, v) => document.querySelectorAll(sel).forEach(e => e.textContent = v);
+  set('.js-snp', SNP_TXT()); set('.js-dod', DOD_TXT());
+  set('.js-jk-poj', JK_POJ); set('.js-jk-por', JK_POR); set('.js-jk-izu', JK_IZU);
+})();
 const JEDNOKRATNA_SITUACIJE = [
   { label:'Smrt člana porodice', max:JK_STD, note:'Pravo se priznaje uz izvod iz matične knjige umrlih.' },
   { label:'Povratak s liječenja', max:JK_STD, note:'Ponesi otpusno pismo iz bolnice.' },
@@ -1620,9 +1604,9 @@ function voicePlan(text, map){
   return {plan:plan, misses:misses};
 }
 
-var VOICE_MAP = {"#w deset":[0.05,0.801],"#w devedeset":[0.901,1.046],"#w devet":[1.998,0.767],"#w devetnaest":[2.815,1.134],"#w devetsto":[3.999,0.9],"#w dva":[4.949,0.605],"#w dvadeset":[5.603,0.992],"#w dvanaest":[6.645,1.004],"#w dvije":[7.699,0.765],"#w dvjesto":[8.514,0.872],"#w hiljada":[9.436,0.768],"#w hiljade":[10.254,0.812],"#w hiljadu":[11.117,0.763],"#w jedan":[11.93,0.675],"#w jedanaest":[12.654,1.121],"#w jedna":[13.825,0.675],"#w kilometar":[14.551,0.94],"#w kilometara":[15.54,1.018],"#w kilometra":[16.608,0.895],"#w maraka":[17.553,0.841],"#w marka":[18.444,0.747],"#w marke":[19.241,0.765],"#w metar":[20.056,0.722],"#w metara":[20.828,0.755],"#w metra":[21.633,0.651],"#w nula":[22.334,0.689],"#w osam":[23.073,0.635],"#w osamdeset":[23.758,1.039],"#w osamnaest":[24.847,1.065],"#w osamsto":[25.962,0.896],"#w pedeset":[26.908,0.857],"#w pet":[27.816,0.632],"#w petnaest":[28.498,0.946],"#w petsto":[29.494,0.741],"#w sedam":[30.285,0.722],"#w sedamdeset":[31.057,1.05],"#w sedamnaest":[32.157,1.104],"#w sedamsto":[33.311,0.964],"#w sto":[34.324,0.661],"#w tri":[35.035,0.491],"#w trideset":[35.576,0.928],"#w trinaest":[36.554,0.937],"#w tristo":[37.541,0.777],"#w zarez":[38.368,0.834],"#w četiri":[39.251,0.741],"#w četiristo":[40.043,0.975],"#w četrdeset":[41.068,1.07],"#w četrnaest":[42.188,1.101],"#w šesnaest":[43.339,1.017],"#w šest":[44.406,0.882],"#w šeststo":[45.339,0.889],"#w šezdeset":[46.278,1.023],"a":[47.351,0.463],"adresa":[47.864,0.733],"ako ga već imaš samo ponesi kopiju":[48.647,2.727],"ako je imaš samo ponesi kopiju":[51.424,2.454],"ako nalaz još ne postoji centar nakon predaje zahtjeva upućuje podnosioca na ocjenu kod instituta za medicinsko vještačenje zdravstvenog stanja":[53.928,8.365],"ako nalaz utvrdi radnu sposobnost upravni postupak se obustavlja":[62.343,4.443],"ako ne znaš gdje je šalter javi se zaštitaru na ulazu":[66.835,3.563],"ako osiguranje nije aktivno osoba se obraća poslodavcu i zavodu zdravstvenog osiguranja":[70.448,5.519],"ako primaš penziju":[76.017,1.435],"ako se osoba tek doselila prvo treba prijaviti prebivalište u tuzli":[77.502,4.276],"ako si nezaposlen":[81.828,1.353],"ako utvrdi nesposobnost postupak se nastavlja izradom socijalne anamneze i rješenja":[83.231,5.384],"albina i franje herljevića 1 tuzla":[88.665,2.806],"bosne srebrene 31 tuzla":[91.52,2.595],"centar procjenjuje svaki slučaj posebno":[94.165,2.647],"centar procjenjuje svaki slučaj posebno prema članu 22 zakona pa ovdje nema fiksnog testa ispunjenosti uslova prikazani su najviši mogući iznosi po vrsti situacije":[96.862,10.459],"centar upućuje podnosioca na ocjenu kod instituta za medicinsko vještačenje zdravstvenog stanja nakon predaje zahtjeva":[107.371,6.89],"da li je osoba korisnik stalne novčane pomoći":[114.311,3.242],"da li je osoba trenutno nezaposlena i prijavljena birou rada":[117.604,3.719],"da li je ovo dijete zaposleno":[121.373,1.979],"da li podnosilac živi sam bez bračnog partnera i djece u domaćinstvu":[123.401,4.707],"dijete":[128.159,0.859],"djeca predškolskog uzrasta koja nisu osigurana po drugom osnovu npr":[129.068,4.489],"do":[133.607,0.562],"dodatak po članu domaćinstva koji je nesposoban za rad ili se redovno školuje":[134.219,4.92],"dokaz o prebivalištu ili boravištu pba":[139.189,3.257],"dokaz o prebivalištu ili boravištu pba 4":[142.496,3.387],"dokaz o prestanku prethodnog osiguranja rješenje o prestanku radnog odnosa potvrda o završetku školovanja i sl":[145.933,7.156],"dom zdravlja mustafa šehović":[153.138,2.5],"federalni zavod pio mio":[155.688,1.821],"franjevačka 36 tuzla":[157.559,2.568],"geodetska i imovinsko pravna služba":[160.177,2.539],"grad tuzla geodetska i imovinsko pravna služba":[162.765,3.383],"ili pba":[166.198,1.224],"ima li osoba za koju se traži osiguranje prijavljeno prebivalište na području grada tuzla":[167.472,5.266],"ima li podnosilac djecu koja ne žive s njim a po porodičnom zakonu fbih su obavezna na izdržavanje":[172.788,6.27],"ima li podnosilac zahtjeva prijavljeno prebivalište na području grada tuzla najmanje 6 mjeseci":[179.108,5.941],"ispod zakonskog cenzusa od":[185.099,2.103],"izabrati vrstu pomoći uslovi će biti objašnjeni a potom se po želji sastavlja i ruta do ustanova":[187.252,6.317],"iznad zakonskog cenzusa od":[193.619,2.086],"iznos se određuje prema prosječnoj plaći ostvarenoj u tuzlanskom kantonu u prethodnoj godini":[195.756,5.097],"izostanak sa javljanja može dovesti do brisanja sa evidencije i gubitka osiguranja":[200.903,4.859],"izuzetno do":[205.812,1.067],"izuzetno i do":[206.929,1.301],"izvod iz matične knjige rođenih":[208.28,2.236],"izvod iz matične knjige rođenih za dijete":[210.567,2.642],"kad je više djece istovremeno u mogućnosti pomoći obaveza izdržavanja se dijeli među njima prema njihovim mogućnostima član 223 porodičnog zakona fbih ne mora je snositi samo jedno dijete":[213.259,11.544],"kad uđeš uzmi broj ako postoji aparat":[224.853,2.971],"kod teške bolesti":[227.874,1.433],"kojoj starosnoj kategoriji osoba pripada":[229.357,2.654],"koliko djece punoljetnih treba provjeriti pojedinačno":[232.062,3.625],"koliko domaćinstvo ukupno prima mjesečno u km":[235.737,3.553],"koliko godina ima podnosilac zahtjeva":[239.339,2.639],"koliko članova ima domaćinstvo uključujući podnosioca zahtjeva":[242.028,4.194],"kontakt sa srodnicima je nepoznat ili prekinut":[246.272,3.01],"kontakt sa srodnicima nije poznat":[249.332,2.311],"kopija prijave prebivališta cips":[251.693,2.639],"kopija prijave prebivališta cips za dijete":[254.382,3.362],"kopija prijave prebivališta cips za roditelje ili staratelje":[257.793,4.335],"korisnici stalne novčane pomoći ostvaruju zdravstveno osiguranje automatski na osnovu rješenja o stalnoj novčanoj pomoći nije potreban poseban zahtjev":[262.178,8.951],"kozaračka tuzla":[271.179,1.59],"kućna lista":[272.82,1.248],"lična karta":[274.118,1.12],"lična karta podnosioca":[275.288,1.88],"majka je preminuo potreban izvod iz matične knjige umrlih ne može biti obveznik izdržavanja":[277.218,5.796],"majka ostvaruje":[283.064,1.287],"majka podnosioca da li je živ":[284.401,2.231],"maršala tita 151 tuzla":[286.682,2.709],"matični ured zgrada grada tuzla":[289.441,2.569],"medicinska dokumentacija":[292.06,1.907],"mjesečna pomoć za osobe i porodice bez dovoljno prihoda za izdržavanje":[294.018,4.356],"mjesečna pomoć za osobe i porodice koje nemaju dovoljno prihoda za izdržavanje":[298.424,4.771],"mjesečno":[303.244,0.945],"mup tuzlanski kanton":[304.24,1.715],"na":[306.004,0.5],"nadležni centar za socijalni rad predaja zahtjeva":[306.554,3.444],"najviši iznos":[310.048,1.662],"nalaz ne stariji od 6 mjeseci":[311.761,2.393],"napomena":[314.204,1.177],"ne postoje srodnici u odvojenom domaćinstvu obavezni na izdržavanje uslov je ispunjen":[315.431,5.204],"nema prihode u inostranstvu uz prevedenu potvrdu nadležnog stranog organa smatra se da nije u mogućnosti izvršavati obavezu izdržavanja":[320.684,8.251],"nezaposlen uz uvjerenje sa biroa rada ili porezne uprave po članu 16 zakona se smatra da nije u mogućnosti izvršavati obavezu izdržavanja":[328.985,8.742],"nije u mogućnosti izvršavati obavezu izdržavanja":[337.777,3.186],"nosi original samo na uvid":[341.013,2.35],"notar":[343.414,0.795],"obavijest o tekućem računu":[344.259,1.939],"od":[346.247,0.495],"od polazne tačke":[346.793,1.385],"od prethodne stanice":[348.228,1.597],"odluku donosi stručni tim centra na osnovu medicinske dokumentacije":[349.874,4.216],"oko":[354.141,0.611],"ona ne predstavlja službenu odluku":[354.801,2.142],"osiguranje ostaje aktivno samo dok je osoba uredno prijavljena potrebno je redovno se javljati birou prema određenim terminima":[356.993,7.217],"osnovni iznos":[364.26,1.618],"osobe starije od 65 godina bez osiguranja po drugom osnovu predaju poseban zahtjev sa dokumentacijom ispod":[365.928,6.924],"ostvaruje":[372.902,0.914],"otac je preminuo potreban izvod iz matične knjige umrlih ne može biti obveznik izdržavanja":[373.867,5.716],"otac ostvaruje":[379.633,1.302],"otac podnosioca da li je živ":[380.984,2.168],"ovaj osnov ne ide preko centra za socijalni rad":[383.203,3.016],"ovaj vodič je pilot za grad tuzlu":[386.269,2.18],"ovdje uzimaš":[388.499,1.554],"ovjerava se kod notara":[390.103,1.619],"ovjerena izjava da nema sredstava za izdržavanje":[391.771,3.087],"ovjerena izjava da nemaš primanja iz inostranstva":[394.908,3.039],"ovo je orijentaciona procjena bazirana na važećim zakonskim propisima":[397.997,4.428],"ovo je orijentaciona procjena bazirana na važećim zakonskim propisima i striktno zavisi od tačnosti unesenih podataka":[402.475,7.182],"ovo pribavlja centar po službenoj dužnosti ne moraš ići":[409.706,3.596],"po redoslijedu nasljeđivanja član 223 zakona prvo se provjeravaju djeca":[413.353,5.233],"po članu 16 zakona i članu 219 porodičnog zakona fbih obavezan je učestvovati u izdržavanju":[418.635,6.717],"po članu 216 stav 2 porodičnog zakona fbih dužan je izdržavati podnosioca dok nesposobnost traje":[425.402,6.957],"po članu domaćinstva":[432.409,1.556],"po članu domaćinstva potrebna prevedena platna i kućna lista":[434.014,4.073],"podnosilac ima manje od 65 godina da li posjeduje nalaz komisije o radnoj nesposobnosti":[438.138,6.189],"pomoć za hitnu situaciju bolest smrt u porodici povratak s liječenja i slično":[444.377,5.346],"pomoć za jednu konkretnu tešku situaciju ne isplaćuje se mjesečno":[449.773,4.385],"ponesi otpusno pismo iz bolnice":[454.208,2.281],"ponesi potvrdu o otpuštanju":[456.539,2.137],"porezna uprava":[458.727,1.186],"postoji nekoliko zakonskih osnova za ostvarivanje zdravstvenog osiguranja kada ono ne postoji po osnovu zaposlenja":[459.963,6.467],"potrebna je terenska provjera socijalnog radnika i odluka stručnog tima centra prije konačne ocjene ovog uslova":[466.48,6.454],"potvrda o školovanju":[472.984,1.616],"pravo na jednokratnu pomoć može se priznati istoj osobi ili porodici najviše tri puta u toku kalendarske godine":[474.65,6.6],"pravo se priznaje najviše tri puta godišnje istoj osobi ili porodici":[481.3,4.307],"pravo se priznaje uz izvod iz matične knjige umrlih":[485.657,3.216],"predaješ sve skupljene papire ovdje":[488.923,2.441],"preko roditelja ostvaruju zdravstveno osiguranje preko centra za socijalni rad":[491.414,4.711],"prema članu 216 stav 2 porodičnog zakona fbih roditelji su dužni izdržavati punoljetno dijete koje je nesposobno za rad i nema dovoljno sredstava za život dok ta nesposobnost traje i kada ne žive u istom domaćinstvu":[496.175,13.15],"prema članu 219 porodičnog zakona fbih punoljetno dijete dužno je izdržavati roditelja koji je nesposoban za rad i nema dovoljno sredstava za život i onda kada ne žive u istom domaćinstvu":[509.375,11.4],"presuda o razvodu izdržavanju":[520.825,2.172],"pri zakonskom cenzusu od":[523.047,1.91],"prihod po članu domaćinstva iznosi":[525.007,2.373],"prihodi domaćinstva radna sposobnost i postojanje srodnika koji su po zakonu u mogućnosti pružiti izdržavanje":[527.43,6.745],"prijava prebivališta ili boravišta pba":[534.225,3.201],"prijava prebivališta ili boravišta pba 1 ili pba 3":[537.476,4.375],"prijavom na evidenciju nezaposlenih u roku od 30 dana od prestanka prethodnog osiguranja zdravstveno osiguranje se ostvaruje preko biroa rada":[541.901,8.418],"provjeravaju se prihodi isključivo krvnog srodnika sina kćerke ne i njegovog bračnog partnera":[550.369,6.033],"provjerom uslova utvrđuje se koji osnov odgovara konkretnoj situaciji":[556.452,4.198],"prva stanica":[560.7,1.105],"radna nesposobnost je utvrđena po godinama starosti ili nalazu komisije":[561.856,4.777],"radna nesposobnost još nije utvrđena":[566.682,2.465],"rezultat striktno zavisi od tačnosti unesenih podataka i ne predstavlja službenu odluku":[569.197,5.109],"rješenje o invalidnosti pomoći dodatku":[574.356,2.642],"roditelji se provjeravaju samo ako podnosilac nikada nije imao vlastitu porodicu bez djece i bez prethodnog braka":[577.047,6.971],"rudarska 72 tuzla":[584.069,2.371],"ruta je spremna":[586.49,1.157],"sastav domaćinstva djeca i nesposobni članovi":[587.697,3.19],"služba za zapošljavanje tk biro rada":[590.937,2.787],"stanica":[593.774,0.906],"turalibegova bb tuzla":[594.73,1.972],"u skladu sa članom 107 zakona o pravu u prvom stupnju rješenjem odlučuje nadležni centar za socijalni rad na osnovu podnesenog zahtjeva i cjelokupne dokumentacije":[596.752,10.046],"ukoliko se okolnosti promijene pravo se može ponovo ispitati podnošenje zahtjeva se svejedno preporučuje":[606.847,6.361],"uslov je ispunjen":[613.258,1.307],"uslov nije ispunjen":[614.615,1.498],"uslovi se provjeravaju prema trima kriterijima":[616.162,3.1],"ustanova":[619.313,1.127],"uvjerenje":[620.49,0.926],"uvjerenje boračko invalidska zaštita":[621.466,2.866],"uvjerenje da dijete nije osigurano po drugom osnovu":[624.383,3.163],"uvjerenje da osiguranje ne postoji po drugom osnovu":[627.596,3.162],"uvjerenje da osoba nije osigurana po drugom osnovu":[630.808,3.248],"uvjerenje da si na evidenciji biro rada":[634.106,2.697],"uvjerenje geodetska i imovinsko pravna služba":[636.853,3.22],"uvjerenje iz porezne uprave":[640.123,1.915],"uvjerenje o državljanstvu":[642.088,1.78],"uvjerenje o primanjima":[643.918,1.633],"uvjerenje o primanjima ček od penzije pio mio":[645.601,3.158],"vadi se u tvojoj banci":[648.809,1.574],"vadi se u školi ili na fakultetu adresa zavisi od ustanove":[650.432,4.122],"za osobe bez zdravstvenog osiguranja po drugom osnovu":[654.604,3.37],"za osobe u stanju socijalne potrebe koje nisu osigurane po drugom osnovu a imaju prijavljeno prebivalište na području grada doprinos za zdravstveno osiguranje plaća grad tuzla iz budžeta":[658.024,10.791],"za pojedinca":[668.865,1.449],"za porodicu":[670.364,1.348],"zahtjev nadležnoj gradskoj službi":[671.761,2.247],"zaposlena osoba je zdravstveno osigurana preko poslodavca koji uplaćuje doprinose":[674.058,5.179],"zavnobih a 11 tuzla":[679.287,2.271],"zavod zdravstvenog osiguranja tk":[681.607,2.397],"zdravstveno osiguranje preko centra za socijalni rad ili grada ostvaruje se u mjestu prebivališta pa se osoba obraća nadležnim službama u mjestu gdje ima prijavljeno prebivalište":[684.054,9.939],"ček od penzije pio mio":[694.043,1.871],"člana":[695.965,0.678],"člana potrebna prevedena platna i kućna lista":[696.692,3.375]};
+var VOICE_MAP = {"#w deset":[0.05,0.801],"#w devedeset":[0.901,1.046],"#w devet":[1.998,0.767],"#w devetnaest":[2.815,1.134],"#w devetsto":[3.999,0.9],"#w dva":[4.949,0.605],"#w dvadeset":[5.603,0.992],"#w dvanaest":[6.645,1.004],"#w dvije":[7.699,0.765],"#w dvjesto":[8.514,0.872],"#w hiljada":[9.436,0.768],"#w hiljade":[10.254,0.812],"#w hiljadu":[11.117,0.763],"#w jedan":[11.93,0.675],"#w jedanaest":[12.654,1.121],"#w jedna":[13.825,0.675],"#w kilometar":[14.551,0.94],"#w kilometara":[15.54,1.018],"#w kilometra":[16.608,0.895],"#w maraka":[17.553,0.841],"#w marka":[18.444,0.747],"#w marke":[19.241,0.765],"#w metar":[20.056,0.722],"#w metara":[20.828,0.755],"#w metra":[21.633,0.651],"#w nula":[22.334,0.689],"#w osam":[23.073,0.635],"#w osamdeset":[23.758,1.039],"#w osamnaest":[24.847,1.065],"#w osamsto":[25.962,0.896],"#w pedeset":[26.908,0.857],"#w pet":[27.816,0.632],"#w petnaest":[28.498,0.946],"#w petsto":[29.494,0.741],"#w sedam":[30.285,0.722],"#w sedamdeset":[31.057,1.05],"#w sedamnaest":[32.157,1.104],"#w sedamsto":[33.311,0.964],"#w sto":[34.324,0.661],"#w tri":[35.035,0.491],"#w trideset":[35.576,0.928],"#w trinaest":[36.554,0.937],"#w tristo":[37.541,0.777],"#w zarez":[38.368,0.834],"#w četiri":[39.251,0.741],"#w četiristo":[40.043,0.975],"#w četrdeset":[41.068,1.07],"#w četrnaest":[42.188,1.101],"#w šesnaest":[43.339,1.017],"#w šest":[44.406,0.882],"#w šeststo":[45.339,0.889],"#w šezdeset":[46.278,1.023],"a":[47.351,0.463],"adresa":[47.864,0.733],"ako ga već imaš samo ponesi kopiju":[48.647,2.727],"ako je imaš samo ponesi kopiju":[51.424,2.454],"ako nalaz još ne postoji centar nakon predaje zahtjeva upućuje podnosioca na ocjenu kod instituta za medicinsko vještačenje zdravstvenog stanja":[53.928,8.365],"ako nalaz utvrdi radnu sposobnost upravni postupak se obustavlja":[62.343,4.443],"ako ne znaš gdje je šalter javi se zaštitaru na ulazu":[66.835,3.563],"ako osiguranje nije aktivno osoba se obraća poslodavcu i zavodu zdravstvenog osiguranja":[70.448,5.519],"ako primaš penziju":[76.017,1.435],"ako se osoba tek doselila prvo treba prijaviti prebivalište u tuzli":[77.502,4.276],"ako si nezaposlen":[81.828,1.353],"ako utvrdi nesposobnost postupak se nastavlja izradom socijalne anamneze i rješenja":[83.231,5.384],"albina i franje herljevića 1 tuzla":[88.665,2.806],"bosne srebrene 31 tuzla":[91.52,2.595],"centar procjenjuje svaki slučaj posebno":[94.165,2.647],"centar procjenjuje svaki slučaj posebno prema članu 22 zakona pa ovdje nema fiksnog testa ispunjenosti uslova prikazani su najviši mogući iznosi po vrsti situacije":[96.862,10.459],"centar upućuje podnosioca na ocjenu kod instituta za medicinsko vještačenje zdravstvenog stanja nakon predaje zahtjeva":[107.371,6.89],"da li je osoba korisnik stalne novčane pomoći":[114.311,3.242],"da li je osoba trenutno nezaposlena i prijavljena birou rada":[117.604,3.719],"da li je ovo dijete zaposleno":[121.373,1.979],"da li podnosilac živi sam bez bračnog partnera i djece u domaćinstvu":[123.401,4.707],"dijete":[128.159,0.859],"djeca predškolskog uzrasta koja nisu osigurana po drugom osnovu npr":[129.068,4.489],"do":[133.607,0.562],"dodatak po članu domaćinstva koji je nesposoban za rad ili se redovno školuje":[134.219,4.92],"dokaz o prebivalištu ili boravištu pba":[139.189,3.257],"dokaz o prebivalištu ili boravištu pba 4":[142.496,3.387],"dokaz o prestanku prethodnog osiguranja rješenje o prestanku radnog odnosa potvrda o završetku školovanja i sl":[145.933,7.156],"dom zdravlja mustafa šehović":[153.138,2.5],"federalni zavod pio mio":[155.688,1.821],"franjevačka 36 tuzla":[157.559,2.568],"geodetska i imovinsko pravna služba":[160.177,2.539],"grad tuzla geodetska i imovinsko pravna služba":[162.765,3.383],"ili pba":[166.198,1.224],"ima li osoba za koju se traži osiguranje prijavljeno prebivalište na području grada tuzla":[167.472,5.266],"ima li podnosilac djecu koja ne žive s njim a po porodičnom zakonu fbih su obavezna na izdržavanje":[172.788,6.27],"ima li podnosilac zahtjeva prijavljeno prebivalište na području grada tuzla najmanje 6 mjeseci":[179.108,5.941],"ispod zakonskog cenzusa od":[185.099,2.103],"izabrati vrstu pomoći uslovi će biti objašnjeni a potom se po želji sastavlja i ruta do ustanova":[187.252,6.317],"iznad zakonskog cenzusa od":[193.619,2.086],"iznos se određuje prema prosječnoj plaći ostvarenoj u tuzlanskom kantonu u prethodnoj godini":[195.756,5.097],"izostanak sa javljanja može dovesti do brisanja sa evidencije i gubitka osiguranja":[200.903,4.859],"izuzetno do":[205.812,1.067],"izuzetno i do":[206.929,1.301],"izvod iz matične knjige rođenih":[208.28,2.236],"izvod iz matične knjige rođenih za dijete":[210.567,2.642],"kad je više djece istovremeno u mogućnosti pomoći obaveza izdržavanja se dijeli među njima prema njihovim mogućnostima član 223 porodičnog zakona fbih ne mora je snositi samo jedno dijete":[213.259,11.544],"kad uđeš uzmi broj ako postoji aparat":[224.853,2.971],"kod teške bolesti":[227.874,1.433],"kojoj starosnoj kategoriji osoba pripada":[229.357,2.654],"koliko djece punoljetnih treba provjeriti pojedinačno":[232.062,3.625],"koliko domaćinstvo ukupno prima mjesečno u km":[235.737,3.553],"koliko godina ima podnosilac zahtjeva":[239.339,2.639],"koliko članova ima domaćinstvo uključujući podnosioca zahtjeva":[242.028,4.194],"kontakt sa srodnicima je nepoznat ili prekinut":[246.272,3.01],"kontakt sa srodnicima nije poznat":[249.332,2.311],"kopija prijave prebivališta cips":[251.693,2.639],"kopija prijave prebivališta cips za dijete":[254.382,3.362],"kopija prijave prebivališta cips za roditelje ili staratelje":[257.793,4.335],"korisnici stalne novčane pomoći ostvaruju zdravstveno osiguranje automatski na osnovu rješenja o stalnoj novčanoj pomoći nije potreban poseban zahtjev":[262.178,8.951],"kozaračka tuzla":[271.179,1.59],"kućna lista":[272.82,1.248],"lična karta":[274.118,1.12],"lična karta podnosioca":[275.288,1.88],"majka je preminula potreban izvod iz matične knjige umrlih ne može biti obveznik izdržavanja":[277.218,5.813],"majka ostvaruje":[283.082,1.287],"majka podnosioca da li je živa":[284.418,2.388],"maršala tita 151 tuzla":[286.856,2.709],"matični ured zgrada grada tuzla":[289.615,2.569],"medicinska dokumentacija":[292.235,1.907],"mjesečna pomoć za osobe i porodice bez dovoljno prihoda za izdržavanje":[294.192,4.356],"mjesečna pomoć za osobe i porodice koje nemaju dovoljno prihoda za izdržavanje":[298.598,4.771],"mjesečno":[303.419,0.945],"mup tuzlanski kanton":[304.414,1.715],"na":[306.179,0.5],"na polaznoj tački":[306.729,1.436],"nadležni centar za socijalni rad predaja zahtjeva":[308.214,3.444],"najviši iznos":[311.709,1.662],"nalaz ne stariji od 6 mjeseci":[313.421,2.393],"napomena":[315.864,1.177],"ne postoje srodnici u odvojenom domaćinstvu obavezni na izdržavanje uslov je ispunjen":[317.091,5.204],"nema prihode u inostranstvu uz prevedenu potvrdu nadležnog stranog organa smatra se da nije u mogućnosti izvršavati obavezu izdržavanja":[322.344,8.251],"nezaposlen uz uvjerenje sa biroa rada ili porezne uprave po članu 16 zakona se smatra da nije u mogućnosti izvršavati obavezu izdržavanja":[330.645,8.742],"nije u mogućnosti izvršavati obavezu izdržavanja":[339.437,3.186],"nosi original samo na uvid":[342.674,2.35],"notar":[345.074,0.795],"obavijest o tekućem računu":[345.919,1.939],"od":[347.908,0.495],"od polazne tačke":[348.453,1.385],"od prethodne stanice":[349.888,1.597],"odluku donosi stručni tim centra na osnovu medicinske dokumentacije":[351.535,4.216],"oko":[355.801,0.611],"ona ne predstavlja službenu odluku":[356.462,2.142],"osiguranje ostaje aktivno samo dok je osoba uredno prijavljena potrebno je redovno se javljati birou prema određenim terminima":[358.653,7.217],"osnovni iznos":[365.921,1.618],"osobe starije od 65 godina bez osiguranja po drugom osnovu predaju poseban zahtjev sa dokumentacijom ispod":[367.589,6.924],"ostvaruje":[374.563,0.914],"otac je preminuo potreban izvod iz matične knjige umrlih ne može biti obveznik izdržavanja":[375.527,5.716],"otac ostvaruje":[381.293,1.302],"otac podnosioca da li je živ":[382.645,2.168],"ovaj osnov ne ide preko centra za socijalni rad":[384.863,3.016],"ovaj vodič je pilot za grad tuzlu":[387.929,2.18],"ovdje uzimaš":[390.16,1.554],"ovjerava se kod notara":[391.763,1.619],"ovjerena izjava da nema sredstava za izdržavanje":[393.432,3.087],"ovjerena izjava da nemaš primanja iz inostranstva":[396.568,3.039],"ovo je orijentaciona procjena bazirana na važećim zakonskim propisima":[399.657,4.428],"ovo je orijentaciona procjena bazirana na važećim zakonskim propisima i striktno zavisi od tačnosti unesenih podataka":[404.135,7.182],"ovo pribavlja centar po službenoj dužnosti ne moraš ići":[411.367,3.596],"po redoslijedu nasljeđivanja član 223 zakona prvo se provjeravaju djeca":[415.013,5.233],"po članu 16 zakona i članu 219 porodičnog zakona fbih obavezan je učestvovati u izdržavanju":[420.296,6.717],"po članu 216 stav 2 porodičnog zakona fbih dužan je izdržavati podnosioca dok nesposobnost traje":[427.062,6.957],"po članu 216 stav 2 porodičnog zakona fbih dužna je izdržavati podnosioca dok nesposobnost traje":[434.069,6.878],"po članu domaćinstva":[440.997,1.556],"po članu domaćinstva potrebna prevedena platna i kućna lista":[442.603,4.073],"podnosilac ima manje od 65 godina da li posjeduje nalaz komisije o radnoj nesposobnosti":[446.726,6.189],"pomoć za hitnu situaciju bolest smrt u porodici povratak s liječenja i slično":[452.965,5.346],"pomoć za jednu konkretnu tešku situaciju ne isplaćuje se mjesečno":[458.361,4.385],"ponesi otpusno pismo iz bolnice":[462.796,2.281],"ponesi potvrdu o otpuštanju":[465.128,2.137],"porezna uprava":[467.315,1.186],"postoji nekoliko zakonskih osnova za ostvarivanje zdravstvenog osiguranja kada ono ne postoji po osnovu zaposlenja":[468.551,6.467],"potrebna je terenska provjera socijalnog radnika i odluka stručnog tima centra prije konačne ocjene ovog uslova":[475.068,6.454],"potvrda o školovanju":[481.572,1.616],"pravo na jednokratnu pomoć može se priznati istoj osobi ili porodici najviše tri puta u toku kalendarske godine":[483.238,6.6],"pravo se priznaje najviše tri puta godišnje istoj osobi ili porodici":[489.888,4.307],"pravo se priznaje uz izvod iz matične knjige umrlih":[494.245,3.216],"predaješ sve skupljene papire ovdje":[497.511,2.441],"preko roditelja ostvaruju zdravstveno osiguranje preko centra za socijalni rad":[500.002,4.711],"prema članu 216 stav 2 porodičnog zakona fbih roditelji su dužni izdržavati punoljetno dijete koje je nesposobno za rad i nema dovoljno sredstava za život dok ta nesposobnost traje i kada ne žive u istom domaćinstvu":[504.763,13.15],"prema članu 219 porodičnog zakona fbih punoljetno dijete dužno je izdržavati roditelja koji je nesposoban za rad i nema dovoljno sredstava za život i onda kada ne žive u istom domaćinstvu":[517.963,11.4],"presuda o razvodu izdržavanju":[529.413,2.172],"pri zakonskom cenzusu od":[531.635,1.91],"prihod po članu domaćinstva iznosi":[533.596,2.373],"prihodi domaćinstva radna sposobnost i postojanje srodnika koji su po zakonu u mogućnosti pružiti izdržavanje":[536.019,6.745],"prijava prebivališta ili boravišta pba":[542.813,3.201],"prijava prebivališta ili boravišta pba 1 ili pba 3":[546.064,4.375],"prijavom na evidenciju nezaposlenih u roku od 30 dana od prestanka prethodnog osiguranja zdravstveno osiguranje se ostvaruje preko biroa rada":[550.49,8.418],"provjeravaju se prihodi isključivo krvnog srodnika sina kćerke ne i njegovog bračnog partnera":[558.957,6.033],"provjerom uslova utvrđuje se koji osnov odgovara konkretnoj situaciji":[565.04,4.198],"prva stanica":[569.288,1.105],"radna nesposobnost je utvrđena po godinama starosti ili nalazu komisije":[570.444,4.777],"radna nesposobnost još nije utvrđena":[575.271,2.465],"rezultat striktno zavisi od tačnosti unesenih podataka i ne predstavlja službenu odluku":[577.785,5.109],"rješenje o invalidnosti pomoći dodatku":[582.944,2.642],"roditelji se provjeravaju samo ako podnosilac nikada nije imao vlastitu porodicu bez djece i bez prethodnog braka":[585.636,6.971],"rudarska 72 tuzla":[592.657,2.371],"ruta je spremna":[595.078,1.157],"sastav domaćinstva djeca i nesposobni članovi":[596.285,3.19],"služba za zapošljavanje tk biro rada":[599.525,2.787],"stanica":[602.362,0.906],"turalibegova bb tuzla":[603.318,1.972],"u istoj zgradi kao prethodna stanica":[605.34,2.409],"u skladu sa članom 107 zakona o pravu u prvom stupnju rješenjem odlučuje nadležni centar za socijalni rad na osnovu podnesenog zahtjeva i cjelokupne dokumentacije":[607.799,10.046],"ukoliko se okolnosti promijene pravo se može ponovo ispitati podnošenje zahtjeva se svejedno preporučuje":[617.895,6.361],"uslov je ispunjen":[624.305,1.307],"uslov nije ispunjen":[625.662,1.498],"uslovi se provjeravaju prema trima kriterijima":[627.21,3.1],"ustanova":[630.36,1.127],"uvjerenje":[631.537,0.926],"uvjerenje boračko invalidska zaštita":[632.513,2.866],"uvjerenje da dijete nije osigurano po drugom osnovu":[635.43,3.163],"uvjerenje da osiguranje ne postoji po drugom osnovu":[638.643,3.162],"uvjerenje da osoba nije osigurana po drugom osnovu":[641.856,3.248],"uvjerenje da si na evidenciji biro rada":[645.154,2.697],"uvjerenje geodetska i imovinsko pravna služba":[647.9,3.22],"uvjerenje iz porezne uprave":[651.17,1.915],"uvjerenje o državljanstvu":[653.135,1.78],"uvjerenje o primanjima":[654.965,1.633],"uvjerenje o primanjima ček od penzije pio mio":[656.648,3.158],"vadi se u tvojoj banci":[659.856,1.574],"vadi se u školi ili na fakultetu adresa zavisi od ustanove":[661.479,4.122],"za osobe bez zdravstvenog osiguranja po drugom osnovu":[665.651,3.37],"za osobe u stanju socijalne potrebe koje nisu osigurane po drugom osnovu a imaju prijavljeno prebivalište na području grada doprinos za zdravstveno osiguranje plaća grad tuzla iz budžeta":[669.071,10.791],"za pojedinca":[679.912,1.449],"za porodicu":[681.411,1.348],"zahtjev nadležnoj gradskoj službi":[682.809,2.247],"zaposlena osoba je zdravstveno osigurana preko poslodavca koji uplaćuje doprinose":[685.105,5.179],"zavnobih a 11 tuzla":[690.334,2.271],"zavod zdravstvenog osiguranja tk":[692.655,2.397],"zdravstveno osiguranje preko centra za socijalni rad ili grada ostvaruje se u mjestu prebivališta pa se osoba obraća nadležnim službama u mjestu gdje ima prijavljeno prebivalište":[695.101,9.939],"ček od penzije pio mio":[705.091,1.871],"člana":[707.012,0.678],"člana potrebna prevedena platna i kućna lista":[707.74,3.375]};
 // ===== Reprodukcija: Web Audio, jedan zvučni fajl (glas-bs.mp3), bez interneta nakon prvog učitavanja =====
-var VOICE_SRC = "glas-bs.mp3?v=4";
+var VOICE_SRC = "glas-bs.mp3?v=6";
 var __vctx=null, __vbuf=null, __vload=null, __vsrcs=[], __vtoken=0;
 function __voiceCtx(){ if(!__vctx){ var C=window.AudioContext||window.webkitAudioContext; if(C) __vctx=new C(); } return __vctx; }
 function __voiceLoad(){
@@ -1708,7 +1692,11 @@ function najkracaRuta(start, stops, kraj){
   let cur = start;
   return best.map(i => { const s = stops[i]; s.distFromPrev = haversine(cur.lat,cur.lng,s.lat,s.lng); cur = s; return s; });
 }
-function udaljenostTxt(km){ return km < 1 ? 'oko ' + Math.max(10, Math.round(km*100)*10) + ' m od prethodne stanice' : 'oko ' + km.toFixed(1).replace('.',',') + ' km od prethodne stanice'; }
+function udaljenostTxt(km, odPolazne){
+  const od = odPolazne ? ' od polazne tačke' : ' od prethodne stanice';
+  if(km < 0.02) return odPolazne ? 'na polaznoj tački' : 'u istoj zgradi kao prethodna stanica';
+  return km < 1 ? 'oko ' + Math.max(10, Math.round(km*100)*10) + ' m' + od : 'oko ' + km.toFixed(1).replace('.',',') + ' km' + od;
+}
 function computeAndRenderRoute(){
   const stopsEl = document.getElementById('stopsContainer');
   const skipEl = document.getElementById('skipContainer');
@@ -1735,7 +1723,7 @@ function computeAndRenderRoute(){
   ordered.forEach((s,i)=>{
     const card = document.createElement('div');
     card.className = 'stop-card';
-    const shownDist = i===0 ? 'Prva stanica, ' + udaljenostTxt(s.distFromPrev).replace('od prethodne stanice','od polazne tačke') : udaljenostTxt(s.distFromPrev);
+    const shownDist = i===0 ? 'Prva stanica, ' + udaljenostTxt(s.distFromPrev, true) : udaljenostTxt(s.distFromPrev);
     const speech = stopSpeechText(s, i+1, totalStops, shownDist);
     if(i===0) firstStopSpeechText = speech;
     card.innerHTML = `
@@ -1757,7 +1745,7 @@ function computeAndRenderRoute(){
     finalCard.className = 'stop-card final';
     const lastPoint = ordered.length ? ordered[ordered.length-1] : chosenStart;
     const distToCsr = haversine(lastPoint.lat, lastPoint.lng, INSTITUTIONS.csr.lat, INSTITUTIONS.csr.lng);
-    const distTxt2 = ordered.length ? udaljenostTxt(distToCsr) : udaljenostTxt(distToCsr).replace('od prethodne stanice','od polazne tačke');
+    const distTxt2 = udaljenostTxt(distToCsr, !ordered.length);
     const finalStopObj = { name:INSTITUTIONS.csr.name, addr:INSTITUTIONS.csr.addr, docs:["Predaješ sve skupljene papire ovdje"] };
     const finalSpeech = stopSpeechText(finalStopObj, totalStops, totalStops, distTxt2);
     if(totalStops===1) firstStopSpeechText = finalSpeech;
